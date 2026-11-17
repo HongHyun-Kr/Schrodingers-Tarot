@@ -14,6 +14,7 @@
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta property="og:url" content="https://honghyun-kr.github.io/tarot/">
 <meta name="twitter:card" content="summary_large_image">
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.8.2/kakao.min.js" integrity="sha384-zt/G7/KfaRQ9dT/QIkS0ujMtzouJqzuSJcXVQu50x0rl/+mD1dc70AeOejVbMD9E" crossorigin="anonymous" defer></script>
 <style>
 :root{
   --bg:#120f24; --ink:#f5ecd7; --gold:#e8c66a; --muted:#b3acd0;
@@ -462,6 +463,28 @@ body{word-break:keep-all;overflow-wrap:break-word}
 @keyframes enPulse{50%{opacity:.45;transform:scale(.92)}}
 .en-s{color:#cfc6ea;font-size:15px}
 .prize.row{max-width:700px}.prize.row .cbox .small{white-space:nowrap}.prize .big{text-wrap:balance}
+
+/* v21 */
+.prize{margin-bottom:22px!important}
+#homeBtn{position:fixed;top:12px;left:12px;z-index:86;display:inline-flex;align-items:center;gap:6px;padding:7px 14px 7px 11px;border-radius:999px;
+  font-family:var(--kr);font-size:13px;font-weight:700;color:#f3e3bb;cursor:pointer;border:1px solid #b8913a88;
+  background:radial-gradient(ellipse at 50% -20%,#5a4214,#22180a 70%);box-shadow:inset 0 0 0 2px #1c1405,inset 0 0 0 3px #b8913a44,0 4px 12px #0008}
+#homeBtn svg{width:16px;height:16px}
+body[data-screen=intro] #homeBtn,body:not([data-screen]) #homeBtn,body.shared #homeBtn{display:none}
+.vx{line-height:1.85}
+.vx-big{font-family:var(--kr);font-weight:800;font-size:24px;margin:2px 0 8px}
+.vx-big.jackpot{color:#ffe27a}.vx-big.double{color:#d7b4ff}.vx-big.none{color:#e6dcf5}
+.vx-type{margin:18px auto 6px;padding:16px 14px;border-radius:14px;background:linear-gradient(160deg,color-mix(in srgb,var(--lc) 22%,transparent),#ffffff06);border:1px solid color-mix(in srgb,var(--lc) 55%,transparent)}
+.vx-you{font-size:13px;color:#b3acd0;letter-spacing:2px}
+.vx-name{font-size:24px;font-weight:800;color:#fff3c8;margin:2px 0 8px;text-shadow:0 0 12px color-mix(in srgb,var(--lc) 60%,transparent)}
+.vx-desc{font-size:15px;line-height:1.8}
+.vx-lab{margin:14px 0 4px;font-size:15px;line-height:1.7}.vx-lab span{font-size:13px;color:#cfc6ea}
+.vx-lab .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:.05em}
+.vx-lab .vrec{display:inline-block;margin-top:6px}
+.vx-egg{margin:16px 0 4px;padding:12px 14px;border-radius:12px;border:1px dashed #c08bffaa;background:#c08bff12;font-size:15px;line-height:1.8}
+.vx-eh{font-weight:800;color:#e6d0ff;margin-bottom:2px}
+.vx-end{margin-top:16px;padding-top:14px;border-top:1px dashed #e8c66a3a;font-size:16px;line-height:1.8}
+@media (max-width:520px){.vx-big{font-size:21px}.vx-name{font-size:21px}.vx-desc,.vx-egg,.vx-lab{font-size:14px}.vx-end{font-size:14.5px}#homeBtn{top:10px;left:10px;font-size:12px;padding:6px 12px 6px 9px}}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=IM+Fell+English+SC&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
@@ -471,6 +494,7 @@ body{word-break:keep-all;overflow-wrap:break-word}
 <body>
 <canvas id="stars"></canvas>
 <canvas id="fx"></canvas>
+<button id="homeBtn" aria-label="처음 화면으로"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10 L10 3.5 L17 10 M5 8.5 V16.5 H15 V8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg><span>처음으로</span></button>
 <div id="overlay" class="overlay"><div id="ovBox"></div></div>
 <div id="qrOverlay"><div class="qrbox"><div class="qrt">TAKE YOUR FATE</div><div class="qrs">휴대폰 카메라로 찍으면 이 결과를 그대로 가져갈 수 있어요<br><small>결과 화면에서 카드 도감도 볼 수 있어요</small></div>
   <div id="qrImg"></div><div class="qrcards" id="qrCards"></div><div class="qrwarn" id="qrWarn"></div><button class="btn ghost" id="qrClose">닫기</button></div></div>
@@ -3519,6 +3543,19 @@ function attachSave(host,c){
   cardJPG(c).then(u=>{if(!u||host.querySelector('.saveimg'))return;const im=document.createElement('img');
     im.className='saveimg';im.src=u;im.alt=c.kr;im.title=c.kr+' (우클릭·꾹 눌러 저장)';host.appendChild(im)});
 }
+
+const PERSONA={
+  CMP:{type:'새벽 3시의 계산 장인형',line:'안 풀리는 방정식 앞에서 오히려 눈이 반짝이는 타입. 정답보다 “왜”가 더 궁금한 당신에게 칠판과 서버는 놀이터예요.'},
+  PD:{type:'혼돈 조련사형',line:'아크가 튀어도 렌치부터 드는 타입. 장비가 멈추면 오히려 신나는 당신, 보랏빛 플라즈마가 기다리고 있어요.'},
+  SSQM:{type:'정 많은 스핀 메이트형',line:'혼자보다 함께일 때 저항이 뚝 떨어지는 타입. 점심부터 MT까지 같은 방향을 보는 동료가 생길 거예요.'},
+  HSL:{type:'조용한 광합성형',line:'느리지만 꾸준히 빛을 모으는 타입. 소란스럽지 않게, 그러나 정확하게 결과를 내는 사람이에요.'},
+  TMDL:{type:'한 층 한 층 장인형',line:'할 건 끝까지 해내는 임무 완수 타입. 원자 한 층도 허투루 쌓지 않는 당신, 소자를 직접 완성하는 기쁨을 알게 될 거예요.'},
+  NPD:{type:'빛으로 그리는 공방형',line:'직접 만지고 고쳐야 직성이 풀리는 타입. 레이저 한 줄로 실리콘 위에 무늬를 새기는 손맛, 당신 거예요.'},
+  SSNL:{type:'찰나 사냥꾼형',line:'눈 깜짝할 새보다 훨씬 짧은 순간도 놓치지 않는 타입. 처음 보는 개념에도 겁먹지 않는 탐험가예요.'},
+  NSL:{type:'자유로운 철새형',line:'울타리는 싫지만 방향은 확실한 타입. 회의 없이도 알아서 날아가는 당신, 하늘이 넓을수록 신나요.'},
+  QMP:{type:'전자 심문관형',line:'“왜?”를 세 번 이상 묻는 타입. 예상과 다른 결과가 나오면 오히려 설레는 당신에게 전자들이 다 털어놓을 거예요.'},
+  VVL:{type:'헤드셋 쓴 몽상가형',line:'상상을 진짜로 만들고 싶은 타입. 아이디어 하나로 연구·특허·창업까지 달려가는 사람이에요.'}
+};
 /*DATA_END*/
 const EXPLAIN={"web": {"d": "이슬 맺힌 거미줄이 밤하늘에 걸려 있고, 한가운데엔 눈이 땡그란 거미 한 마리가 그물 전체를 붙잡고 있어요.", "w": "CMP의 주무기는 텐서 네트워크예요. 복잡하게 얽힌 양자 상태를 작은 텐서들의 그물로 표현하죠. 노드와 연결선을 그리다 보니 거미줄이 됐어요.", "q": "이 거미는 파리 대신 양자 상태를 잡습니다. 2ᴺ개짜리로요."}, "star": {"d": "보랏빛 플라즈마 별이 반짝이고, 그 아래 놓인 웨이퍼 위로 이온과 라디칼이 비처럼 쏟아져 내려요.", "w": "플라즈마는 전자·이온·라디칼이 뒤섞인 제4의 물질 상태예요. 반도체 식각 공정의 핵심이고, 챔버 창으로 보이는 보랏빛 글로우가 바로 이 별의 정체예요.", "q": "소원은 별한테 빌고, 식각은 플라즈마한테 맡기세요."}, "lovers": {"d": "선글라스 없는 순한 태양 아래, 머리 위 화살표가 같은 방향인 두 사람이 손을 잡고 있어요.", "w": "SSQM은 스핀트로닉스와 MRAM을 연구해요. 두 자성층의 스핀이 평행이면 저항이 낮고 반평행이면 높아요. 함께 으쌰으쌰하는 분위기까지 담아 연인 카드로 만들었어요.", "q": "둘이 반대 방향 보면? 저항 올라갑니다. 연애도 소자도."}, "hermit": {"d": "후드를 눌러쓴 나무늘보가 태양전지 랜턴을 들고 언덕에 서 있어요. 동그란 눈과 볼터치가 포인트예요.", "w": "HSL은 반도체 소자와 솔라셀을 연구하는 조용한(은둔형!) 연구실이에요. 상징 동물이 나무늘보라서, 느리지만 꾸준히 빛을 모으는 랜턴을 쥐여 줬어요.", "q": "움직임은 느리지만, 랜턴은 계속 충전 중입니다."}, "hive": {"d": "아래로 갈수록 색이 진해지는 벌집에서 꿀이 몇 방울 흘러내리고, 꿀벌 한 마리가 그 위를 날아다녀요.", "w": "TMDL의 상징은 벌집과 꿀벌이에요. ALD·스퍼터 같은 단위공정으로 박막을 한 층씩 쌓아 올리는 모습이, 칸칸이 쌓이는 벌집과 꼭 닮았어요.", "q": "꿀은 한 방울씩, 박막은 한 층씩."}, "sun": {"d": "선글라스 낀 태양이 보라색 레이저 세 줄을 쏘고, 맞은 자리마다 반짝. 바닥 실리콘엔 물결무늬.", "w": "NPD는 UV 레이저로 실리콘 박막을 녹였다 굳혀 결정화하고, 표면에 주기적인 나노 무늬(LIPSS)를 새겨요. 태양은 레이저, 바닥 물결은 LIPSS예요.", "q": "선글라스는 패션이 아니라 보안경입니다."}, "wheel": {"d": "눈금이 촘촘한 운명의 수레바퀴. 빨간 펌프 빔, 파란 점선 프로브 빔, 바퀴 위엔 손잡은 빨강·파랑 커플.", "w": "SSNL은 펨토초 레이저로 반도체 속 엑시톤이 생기고 움직이고 사라지는 과정을 관찰해요. 펌프로 때리고 시간차를 두고 프로브로 찍는 방식이 돌아가는 바퀴 같아요.", "q": "운명은 돌고 돕니다. 단, 10⁻¹⁵초 단위로."}, "hiero": {"d": "붉은 커튼 앞 칠판 가득 ψ와 낙서가 적혀 있고, 흰 법복의 교황이 분필 지팡이를 들고 칠판을 가리켜요.", "w": "연구 아이디어는 학생이 키우고 교수님과 토의하며 다듬는 연구실이에요. 정답 대신 “어떻게 풀 건데?”를 물어봐 주시는 칠판 앞의 교황님.", "q": "이 교황님의 성경책은 해밀토니안입니다."}, "emperor": {"d": "몸통이 그냥 진공 챔버인 황제가 앉아 있어요. 뷰포트는 배꼽처럼 보랏빛으로 빛나고, 손엔 홀 대신 렌치.", "w": "플라즈마 원리부터 진공 장비 유지보수까지 직접 다루는 연구실이에요. 장비를 너무 잘 아셔서, 아예 장비가 되어 버린 황제님으로 그렸어요.", "q": "짜치는데 자꾸 보고 싶은 카드 1위."}, "magician": {"d": "머리 위 ∞, 초록 망토 마법사가 말굽자석을 번쩍. 테이블 위 스핀들이 일제히 위를 봐요.", "w": "교수님이 좋아하시는 색은 초록, 연구실이 가장 아끼는 가치는 협업이에요. 흩어진 스핀도 사람도 한 방향으로 모으는 자석의 마법사로 그렸어요.", "q": "이 마법사 앞에선 스핀도 사람도 줄을 섭니다."}, "temper": {"d": "날개 단 천사가 컵에 담긴 빛을 태양전지 패널로 살살 부어요. 한 발은 연못가에, 주변엔 붓꽃이 피어 있어요.", "w": "젠틀한 교수님과 솔라셀 연구를 한 장에 담았어요. 빛을 한 방울씩 천천히 전기로 바꾸는 모습이, 서두르지 않는 절제 카드와 꼭 닮았어요.", "q": "급할수록 천천히. 광자도 천천히 부으면 전기가 됩니다."}, "justice": {"d": "두 기둥 사이 정의의 여신. 저울 한쪽엔 웨이퍼, 다른 쪽엔 곡선 하나 그려진 데이터 쪽지, 반대 손엔 검.", "w": "“정답이라 생각한다면 논리로 설명하라.” TMDL이 가장 중요하게 여기는 가치예요. 타협하지 않는 마음으로 데이터와 논리로 판결하는 정의의 여신이에요.", "q": "근거 없는 주장은 기각합니다. 탕탕."}, "priestess": {"d": "광학 포스트 두 개 사이의 여사제. 왕관엔 렌즈, 무릎 위 실리콘은 반은 결정·반은 비정질, 뒤 휘장엔 나노 물결.", "w": "NPD의 핵심 키워드는 레이저 결정화와 나노포토닉스예요. 빛이 닿는 순간 무질서한 비정질 실리콘이 질서 있는 결정으로 다시 태어나는 장면을 담았어요.", "q": "여사제의 비밀은 “천천히 식혀라”입니다."}, "chariot": {"d": "쇠 맛 나는 흑호 두 마리가 전차를 끌어요. 바퀴 안엔 펄스가 굴러가고, 차체엔 펄스 문양이 새겨져 있어요.", "w": "SSNL의 상징은 “쇠 맛 나는 흑호”예요. 교수님과 수평적으로 의견을 나누고 도전정신을 가장 중요하게 여기는 연구실이라, 함께 달리는 전차로 그렸어요.", "q": "안전벨트 매세요. 이 전차는 펨토초로 출발합니다."}, "moon": {"d": "새벽 3시, 초승달은 졸고 서버랙 불빛만 깜빡여요. 모니터 속 그래프는 드디어 한 점으로 수렴하는 중이에요.", "w": "CMP는 복잡한 양자 문제를 컴퓨터로 푸는 전산 연구실이에요. 계산을 돌려 놓고 결과가 수렴하길 기다리는 밤, 대학원생이라면 누구나 아는 그 풍경이에요.", "q": "달도 자는데 job은 안 잡니다."}, "tower": {"d": "아크 맞고 뚜껑 날아간 챔버. 그을음이 흘러내리고 연기 폴폴. 옆 사다리엔 렌치 든 대학원생.", "w": "장비와 공정 문제를 함께 분석하고 해결하는 연구실이에요. 시행착오를 두려워하지 않고, 고장 난 장비 앞에서 원인부터 찾는 학생이 잘 어울려요.", "q": "탑이 무너질 때 도망가면 학부생, 사다리 타면 대학원생."}, "cups": {"d": "세 사람의 손이 커피잔을 들고 짠! 뒤로는 스키장 설산과 서핑보드가 꽂힌 바다가 펼쳐져 있어요.", "w": "매일 함께 점심 먹고 커피타임, 여름엔 워터파크·서핑, 겨울엔 스키 MT까지. 사이좋기로 소문난 SSQM 대학원생들의 평범한(?) 일상이에요.", "q": "이 연구실 회비 대부분은 원두값이라는 소문이…(사실무근)"}, "void": {"d": "핀 조명 아래 텅 빈 나무 의자 하나. 그 주위로 빨강·파랑 입자 쌍이 생겼다 사라지기를 반복해요.", "w": "HSL은 지금 대학원생이 없어요. 하지만 물리학에서 진공은 결코 비어 있지 않죠. 언제든 새로운 무언가가 생겨날 수 있는 자리라는 뜻이에요.", "q": "누가 앉을진 몰라도, 양자역학적으로는 이미 누가 앉아 있습니다."}, "pentacles": {"d": "성당 대신 TFT 단면을 차곡차곡 쌓는 장인. 아치엔 금화 세 개가 박혀 있고, 장인 손엔 망치가 들려 있어요.", "w": "TMDL은 산화물 반도체로 TFT를 직접 만들어요. 타로의 장인 카드가 원래 건물을 짓는 사람이라, TFT를 짓는 사람으로 바꿨어요. 동전 셋은 소스·게이트·드레인 전극이에요.", "q": "벽돌 대신 원자층, 시멘트 대신 어닐링."}, "mirrors": {"d": "광학 테이블 위 거울 여덟 개, 지그재그로 튕기는 보라색 빔. 보안경 낀 수습생이 노브 돌리는 중.", "w": "NPD의 실험은 광학계 정렬에서 시작해요. 거울과 렌즈를 하나하나 맞추는 꾸준함을 묵묵한 수련의 카드 “8 of Pentacles”로 담았어요.", "q": "빔이 마지막 거울에 딱 맞는 순간, 그게 대학원 행복입니다."}, "world": {"d": "마이크로 LED 픽셀이 박힌 화관 안에서 VR 헤드셋 쓴 사람이 춤춰요. 네 귀퉁이엔 크기별로 색이 다른 퀀텀닷.", "w": "VVL은 퀀텀닷·마이크로 LED와 AR/VR 디스플레이를 연구해요. 세계 카드의 화관을 픽셀로 바꿨고, 퀀텀닷은 작을수록 파랗고 클수록 빨갛게 그렸어요.", "q": "이 세계는 해상도가 무한입니다. 픽셀이 마이크로라서요."}, "kingprism": {"d": "보라 왕좌의 왕이 프리즘을 번쩍. 흰빛이 무지개 여섯 갈래로 퍼지고, 끝엔 전구·두루마리·동전.", "w": "VVL의 상징은 프리즘이에요. 학생 아이디어를 존중하고, 연구는 물론 특허·창업·경진대회까지 함께 밀어주시는 교수님을 빛을 쪼개는 왕으로 그렸어요.", "q": "아이디어 하나 들고 가면 무지개 여섯 개로 돌려받습니다."}, "fool": {"d": "헤드셋 쓴 바보가 절벽 끝으로 성큼. 발밑은 낭떠러지가 아니라 RGB 픽셀 징검다리. 보따리엔 아이디어, 옆엔 신난 강아지.", "w": "VVL은 정해진 답보다 스스로 탐구하는 연구실이에요. 창업·특허 경험도 있죠. 타로 0번 바보는 겁 없는 첫걸음, 새로운 길을 여는 사람을 뜻해요.", "q": "남들은 절벽이라 하고, 이 연구실은 창업 아이템이라 합니다."}, "empress": {"d": "울타리 없는 들판, 쓰러진 기둥, 털에 스핀 하나씩 달고 풀 뜯는 양 떼. 땅 밑엔 지층처럼 박막이 쌓이고 새싹이 올라와요.", "w": "NSL은 정기 미팅 없이 자유롭게 연구하는 “울타리 없는 목장”이에요. 스핀트로닉스와 박막성장을 연구해서 양털엔 스핀, 땅속엔 박막 층을 넣었어요.", "q": "이 목장의 양은 도망가도 괜찮아요. 스핀 방향만 맞으면."}, "kingwings": {"d": "노을 진 하늘 아래 바위에 앉은 노왕. 손엔 스핀처럼 북쪽을 가리키는 나침반, 그 바늘 끝을 따라 철새 떼가 V자로 날아가요.", "w": "NSL의 상징은 철새예요. 자유롭게 날지만 때와 방향은 분명하죠. 실제로 철새는 지구 자기장으로 길을 찾는대요. 오랜 세월 스핀을 연구해 오신 교수님의 나침반이에요.", "q": "회의는 없지만 방향은 있다. 이게 진짜 자율 비행."}, "sixwings": {"d": "작은 배에 포스터 통 들고 탄 대학원생, 머리 위엔 철새 여섯 마리, 건너편엔 깃발 꽂힌 학회장.", "w": "NSL은 국내외 학회 활동이 활발하고, 졸업한 선배들까지 모이는 송년회도 있어요. 새 땅으로 건너가는 “6 of Swords” 카드를 패러디했어요.", "q": "포스터 통 들고 비행기 타는 순간, 진짜 대학원생이 됩니다."}, "ace": {"d": "구름에서 나온 손이 반짝이는 결정 단위 격자를 들고 있어요. 꼭짓점엔 원자, 가운데엔 금빛 원자, 아래로 빛방울이 떨어져요.", "w": "QMP는 제일원리 계산으로 원자와 전자에서 출발해 물질의 성질을 예측해요. 타로의 에이스는 “시작”을 뜻해서, 가장 작은 단위인 결정 격자를 건네는 손으로 그렸어요.", "q": "에이스 카드 중에 원자 개수 세는 건 이 카드뿐입니다."}, "judgement": {"d": "구름 위 천사가 나팔을 불어요. 나팔엔 밴드 구조가 그려진 깃발, 아래 계산 칩에서 파란 전자들이 손 들고 깨어나요.", "w": "QMP는 계산으로 예측하는 데서 그치지 않고 그 물리적 원리까지 설명하려 해요. 잠든 이들을 깨우는 심판 카드처럼, 계산 속 전자를 깨워 “왜?”를 묻는 교수님이에요.", "q": "이 천사의 나팔 소리는 “수렴 완료” 알림음과 같다고 합니다."}, "hangedmag": {"d": "끊어진 줄, 거꾸로 둥둥 뜬 웃는 자석, 아래 초전도체에서 피어오르는 냉기. 옆에선 노트북 든 대학원생이 올려다봐요.", "w": "QMP는 초전도도 연구해요. “매달린 사람”은 세상을 거꾸로 보는 지혜의 카드라서, 예상과 다른 결과도 끝까지 원인을 찾는 학생을 줄 없이 뜬 자석으로 표현했어요.", "q": "줄이 없는데 왜 떠 있냐고요? 그걸 계산하는 게 이 연구실입니다."}, "page": {"d": "시종이 지팡이 끝에 달린 펄스를 신기하게 올려다봐요. 발밑엔 처음 보는 반짝이는 보석(신소재)들이 흩어져 있어요.", "w": "SSNL엔 처음 보는 개념에도 겁먹지 않고 도전하는 학생, 여러 분야로 지식을 넓히고 싶은 학생이 잘 어울려요. 시종 카드는 “배우는 사람”을 뜻해요.", "q": "처음엔 다 시종부터. 지팡이는 연구실에서 줍니다."}};
 const GUIDE=(()=>{
@@ -3570,7 +3607,7 @@ const $=id=>document.getElementById(id);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 
-function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');scrollTo({top:0,behavior:'smooth'})}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');document.body.dataset.screen=id;scrollTo({top:0,behavior:'smooth'})}
 
 /* intro decor */
 THEMES.forEach(t=>$('introCards').appendChild(cardEl(t)));
@@ -3676,7 +3713,7 @@ function buildReading(shared){
   const top=Object.keys(counts).sort((a,b)=>counts[b]-counts[a])[0];
   const mode=counts[top]===3?'jackpot':counts[top]===2?'double':'none';
   const rec= mode==='none'?P.lab:top;
-  RS.mode=mode;
+  RS.mode=mode;RS.rec=rec;
 
   const banner=$('banner');banner.className='result-banner '+mode;
   banner.textContent={jackpot:'★ JACKPOT ★',double:'INTERFERENCE',none:'SUPERPOSITION'}[mode];
@@ -3700,21 +3737,22 @@ function buildReading(shared){
   const eggs=EGGS.filter(e=>e.ids.every(x=>ids.includes(x)));
   const R=LABS[rec];
   const br=t=>t.replace(/([.!?…])\s+(?=\S)/g,'$1<br>');
-  const head={jackpot:['JACKPOT','세 장 모두 '+labCode(rec)],double:['INTERFERENCE','두 장이 '+labCode(rec)+'로 보강 간섭'],none:['SUPERPOSITION','세 장 모두 다른 연구실']}[mode];
-  const desc={jackpot:`파동함수가 하나의 상태로 완전히 붕괴했어요.<br>1/${N_LABS*N_LABS} 확률을 뚫은 <b>관측된 진로</b>예요.`,
-    double:`운명의 확률 진폭이 <b>${labCode(rec)}</b> 쪽으로 기울어 있어요.<br>잭팟은 아깝지만, 간섭무늬의 <b>가장 밝은 줄</b>에 서 있는 셈이에요.`,
-    none:`당신의 운명은 아직 <b>중첩 상태</b>예요.<br>대학원은 직접 관측하는 순간 붕괴하니까,<br>지금 당신을 이끄는 <b>${labCode(rec)}</b>부터 관측해 보세요.`}[mode];
-  const nm = R.name.startsWith(labCode(rec))?R.name:`${labCode(rec)} · ${R.name}`;
   const card=id=>CARDS.find(c=>c.id===id);
+  const T=PERSONA[rec], lcode=labCode(rec);
+  const opener={
+    jackpot:`<div class="vx-big jackpot">🎉 완전 붕괴!</div>과거도, 현재도, 미래도<br>전부 <b>${lcode}</b>을(를) 가리켰어요.<br>확률을 뚫고 파동함수가 딱 한 상태로 정해졌네요.<br>우주가 이렇게까지 확실하게 말하는 일, 흔치 않아요.`,
+    double:`<div class="vx-big double">✨ 보강 간섭!</div>세 장 중 두 장이 <b>${lcode}</b> 쪽에서 겹쳤어요.<br>위상이 딱 맞아서 진폭이 두 배!<br>운명이 꽤 진지하게 손짓하는 중이에요.`,
+    none:`<div class="vx-big none">🌀 아직 중첩 상태</div>세 장이 전부 다른 연구실을 가리키네요.<br>당신의 운명은 여러 가능성이 겹쳐 있는 상태예요.<br>그래도 지금 가장 세게 끌어당기는 건<br><b>${lcode}</b>!`}[mode];
+  const egg=eggs.map(e=>`<div class="vx-egg"><div class="vx-eh">💞 잠깐, ENTANGLED 발견!</div>‘${card(e.ids[0]).kr}’와(과) ‘${card(e.ids[1]).kr}’가 얽혔어요.<br>${br(e.t)}</div>`).join('');
+  const closer=shared?`<div class="vx-end">이 운명, 직접 관측해 보고 싶다면?<br>학술제 타로 부스로 놀러 오세요 🔮</div>`:{
+    jackpot:`<div class="vx-end">부스의 <b>${lcode}</b> 대학원생에게 이 화면을 보여주고<br>밥 한 끼 얻어먹으러 가요 🍽</div>`,
+    double:`<div class="vx-end">부스의 <b>${lcode}</b> 대학원생이<br>커피 한 잔 쏜대요 ☕</div>`,
+    none:`<div class="vx-end">한 번 더 관측하면 운명이 붕괴할지도…? 🔮</div>`}[mode];
   secs.push(`<h3><span class='t'>결론</span>운명의 연구실</h3>
-    <div class="vb"><div class="vl">① 매칭 결과</div><div class="vm ${mode}"><span>${head[1]}${mode==='jackpot'?'!':''}</span></div><div class="vd">${desc}</div></div>
-    <div class="vb"><div class="vl">② 추천 연구실</div>
-      <div class="vlab"><span class="dot" style="background:${R.color}"></span>${nm}</div>
-      <div class="vone">${R.one}</div>
-      <div class="vtags">${R.kw.map(k=>`<span class="tag">${k}</span>`).join('')}</div>
-      <div class="vmsg">“${R.msg}”</div>
-      <div class="vrec ${/없음/.test(R.recruit)?'off':''}">${R.recruit}</div></div>
-    ${eggs.length?`<div class="vb"><div class="vl">③ ENTANGLED · 뜻밖의 얽힘</div>${eggs.map(e=>`<div class="vegg"><div class="pair">‘${card(e.ids[0]).kr}’ <i>×</i> ‘${card(e.ids[1]).kr}’</div><div>${br(e.t)}</div></div>`).join('')}</div>`:''}`);
+    <div class="vx">${opener}</div>
+    <div class="vx-type" style="--lc:${R.color}"><div class="vx-you">그래서 당신은</div><div class="vx-name">${T.type}</div><div class="vx-desc">${br(T.line)}</div></div>
+    <div class="vx-lab"><span class="dot" style="background:${R.color}"></span><b>${R.name.startsWith(lcode)?R.name:lcode+' · '+R.name}</b><br><span>${R.kw.join(' · ')}</span><br><span class="vrec ${/없음/.test(R.recruit)?'off':''}">${R.recruit}</span></div>
+    ${egg}${closer}`);
   RS.secs=secs;
 
   const code=String(Math.floor(1000+Math.random()*9000)), tt=new Date().toTimeString().slice(0,5);
@@ -3741,7 +3779,7 @@ function goStep(i,first){
   [...$('rDots').children].forEach((d,k)=>d.classList.toggle('on',i===3||k===i));
   p.classList.remove('show');void p.offsetWidth;p.innerHTML=RS.secs[i];p.classList.add('show');
   $('prevBtn').style.display=i>0?'':'none';
-  $('guideBtn').style.display=(i===3||document.body.classList.contains('shared'))?'inline-flex':'none';
+  $('guideBtn').style.display=i===3?'inline-flex':'none';
   $('qrBtn').style.display=i===3&&!document.body.classList.contains('shared')?'inline-flex':'none';
   $('nextBtn').style.display=i<3?'inline-block':'none';
   $('nextBtn').innerHTML=i===2?`<span>운명의 연구실 보기</span>${ICO.r}`:`<span>다음 카드</span>${ICO.r}`;
@@ -3825,12 +3863,51 @@ $('qrBtn').onclick=()=>{
 };
 $('shareBtn').innerHTML=`<svg class="ico s" viewBox="0 0 20 20" aria-hidden="true"><circle cx="15" cy="4.5" r="2.3" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="5" cy="10" r="2.3" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="15" cy="15.5" r="2.3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M7 9 L13 5.6 M7 11 L13 14.4" stroke="currentColor" stroke-width="1.5"/></svg><span>결과 공유하기</span>`;
 function toast(t){const el=$('toast');el.textContent=t;el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),2200)}
+const KAKAO_JS_KEY='';   /* ★ 카카오 디벨로퍼스 JavaScript 키를 넣으면 카톡 공유 시 결과마다 다른 카드 이미지가 붙어요 */
+async function resultImageFile(){
+  try{await document.fonts.ready}catch(e){}
+  const W=800,H=400,cv=document.createElement('canvas');cv.width=W*2;cv.height=H*2;const x=cv.getContext('2d');x.scale(2,2);
+  const mode=RS.mode, rec=RS.rec, T=PERSONA[rec], code=labCode(rec);
+  const g=x.createRadialGradient(560,120,40,520,200,620);g.addColorStop(0,'#3a2d6e');g.addColorStop(1,'#120f24');x.fillStyle=g;x.fillRect(0,0,W,H);
+  const R=rng(7);for(let i=0;i<70;i++){x.globalAlpha=.25+R()*.6;x.fillStyle='#fff';x.beginPath();x.arc(R()*W,R()*H,R()*1.3,0,7);x.fill()}x.globalAlpha=1;
+  const imgs=await Promise.all(picks.map(c=>cardJPG(c).then(u=>new Promise(r=>{if(!u)return r(null);const im=new Image();im.onload=()=>r(im);im.onerror=()=>r(null);im.src=u}))));
+  imgs.forEach((im,k)=>{if(!im)return;x.save();x.translate(522+k*92,206+[14,-6,14][k]);x.rotate([-.12,0,.12][k]);x.shadowColor="rgba(0,0,0,.6)";x.shadowBlur=22;x.shadowOffsetY=10;x.drawImage(im,-64,-109,128,218);x.restore()});
+  const KR='"MaruBuri","Gowun Batang","Noto Serif KR",serif', EN='Cinzel,Georgia,serif';
+  x.textBaseline='alphabetic';x.fillStyle='#e8c66a';x.font=`700 14px ${EN}`;x.fillText("✦ SCHRÖDINGER'S TAROT ✦",44,58);
+  const mc={jackpot:'#ffe27a',double:'#d7b4ff',none:'#cfc6ea'}[mode];
+  x.fillStyle=mc;x.font=`900 40px ${EN}`;x.shadowColor=mc;x.shadowBlur=14;x.fillText({jackpot:'JACKPOT',double:'INTERFERENCE',none:'SUPERPOSITION'}[mode],44,112);x.shadowBlur=0;
+  x.fillStyle='#f3e3bb';x.font=`700 21px ${KR}`;x.fillText({jackpot:`세 장 모두 ${code}!`,double:`두 장이 ${code}로 보강 간섭!`,none:'세 장 모두 다른 연구실'}[mode],44,150);
+  x.fillStyle='#b3acd0';x.font=`500 16px ${KR}`;x.fillText('그래서 나의 물리학 운명은',44,208);
+  x.fillStyle='#fff3c8';x.font=`800 30px ${KR}`;x.fillText(T.type,44,248);
+  x.fillStyle='#cfc6ea';x.font=`500 15px ${KR}`;x.fillText(`과거 ${picks[0].kr} · 현재 ${picks[1].kr}`,44,292);x.fillText(`미래 ${picks[2].kr}`,44,316);
+  const pill='나의 물리학 운명은? · 결과에 반전 있음';x.font=`700 14px ${KR}`;const pw=x.measureText(pill).width+28;
+  x.fillStyle='#e8c66a';x.beginPath();x.roundRect?x.roundRect(44,340,pw,30,15):x.rect(44,340,pw,30);x.fill();x.fillStyle='#1e1505';x.fillText(pill,58,360);
+  const blob=await new Promise(r=>cv.toBlob(r,'image/jpeg',.9));
+  return new File([blob],'schrodinger_tarot.jpg',{type:'image/jpeg'});
+}
 $('shareBtn').onclick=async()=>{
-  const url=location.href, text=`🔮 슈뢰딩거의 타로 결과\n과거 · ${picks[0].kr}\n현재 · ${picks[1].kr}\n미래 · ${picks[2].kr}`;
-  if(navigator.share){try{await navigator.share({title:'슈뢰딩거의 타로',text,url});return}catch(e){if(e&&e.name==='AbortError')return}}
+  const url=location.href, T=PERSONA[RS.rec];
+  const title=`🔮 나는 ‘${T.type}’ · 슈뢰딩거의 타로`;
+  const desc=`과거 ${picks[0].kr} · 현재 ${picks[1].kr} · 미래 ${picks[2].kr}`;
+  const text=`${title}\n${desc}`;
+  // 1) 카카오톡 공유 (결과별 이미지 카드)
+  if(KAKAO_JS_KEY&&window.Kakao){try{
+    if(!Kakao.isInitialized())Kakao.init(KAKAO_JS_KEY);
+    const f=await resultImageFile();const dt=new DataTransfer();dt.items.add(f);
+    const up=await Kakao.Share.uploadImage({file:dt.files});
+    const link={mobileWebUrl:url,webUrl:url};
+    Kakao.Share.sendDefault({objectType:'feed',content:{title,description:desc,imageUrl:up.infos.original.url,imageWidth:800,imageHeight:400,link},buttons:[{title:'내 결과 보기',link}]});
+    return}catch(e){console.warn('kakao share failed',e)}}
+  // 2) 휴대폰 공유창 (결과 이미지 첨부)
+  try{const f=await resultImageFile();
+    if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title,text:text+'\n'+url});return}}
+  catch(e){if(e&&e.name==='AbortError')return}
+  // 3) 링크만
+  if(navigator.share){try{await navigator.share({title,text,url});return}catch(e){if(e&&e.name==='AbortError')return}}
   try{await navigator.clipboard.writeText(text+'\n'+url);toast('링크 복사 완료! 붙여 넣어 공유하세요')}
   catch(e){const ta=document.createElement('textarea');ta.value=text+'\n'+url;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('링크 복사 완료! 붙여 넣어 공유하세요')}catch(_){toast('주소창의 링크를 복사해서 공유해 주세요')}ta.remove()}
 };
+$('homeBtn').onclick=()=>{const q=new URLSearchParams(location.search);q.delete('r');q.delete('guide');location.href=location.pathname+(q.toString()?'?'+q:'')};
 $('qrClose').onclick=()=>$('qrOverlay').classList.remove('on');
 $('qrOverlay').onclick=e=>{if(e.target.id==='qrOverlay')$('qrOverlay').classList.remove('on')};
 if(params.get('guide')){GUIDE.mount($('gd'));$('gdOverlay').classList.add('on');document.body.style.overflow='hidden'}
