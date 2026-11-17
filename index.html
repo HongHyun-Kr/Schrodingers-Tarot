@@ -485,6 +485,24 @@ body[data-screen=intro] #homeBtn,body:not([data-screen]) #homeBtn,body.shared #h
 .vx-eh{font-weight:800;color:#e6d0ff;margin-bottom:2px}
 .vx-end{margin-top:16px;padding-top:14px;border-top:1px dashed #e8c66a3a;font-size:16px;line-height:1.8}
 @media (max-width:520px){.vx-big{font-size:21px}.vx-name{font-size:21px}.vx-desc,.vx-egg,.vx-lab{font-size:14px}.vx-end{font-size:14.5px}#homeBtn{top:10px;left:10px;font-size:12px;padding:6px 12px 6px 9px}}
+
+/* v23: 부스 화면 = 카드 + QR만 */
+body.booth #panel,body.booth #rDots,body.booth #prevBtn,body.booth #nextBtn,body.booth #guideBtn,body.booth #qrBtn,body.booth #shareBtn,body.booth .disclaimer{display:none!important}
+body.booth .r-cards.big{--cw:min(clamp(110px,15vw,190px),calc(27vh/1.7));padding-top:6px;margin-top:2px}
+body.booth .r-cards .rc{cursor:default}
+body.booth .r-cards .cap b{font-size:16px}
+#boothQR:empty{display:none}
+.bq{display:flex;align-items:center;gap:26px;margin:14px auto 4px;padding:16px 22px;border-radius:18px;border:1px solid #b8913a88;
+  background:linear-gradient(160deg,#2a1f08cc,#140f22cc);box-shadow:0 0 30px #e8c66a33;text-align:left}
+.bq-img{width:min(190px,19vh);flex:none;background:#fbf3dc;border-radius:12px;padding:8px;box-shadow:inset 0 0 0 3px #b8913a}
+.bq-img svg{display:block;width:100%;height:auto}
+.bq-t{font-size:16px;line-height:1.75;color:#efe3c6}.bq-t b{color:var(--gold)}
+.bq-h{font-size:22px;font-weight:800;color:#fff3c8;margin-bottom:4px}
+.bq-s{font-size:13px;color:#b3acd0;margin-top:6px}
+.bq-warn{color:#ffb4a8;font-size:14px;margin:12px 0}
+body.booth .bwrap .banner-sub{margin-bottom:4px}
+body.booth #againBtn{margin-top:4px}
+@media (max-width:620px){.bq{flex-direction:column;text-align:center;gap:12px}.bq-img{width:min(200px,56vw)}}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=IM+Fell+English+SC&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
@@ -532,6 +550,7 @@ body[data-screen=intro] #homeBtn,body:not([data-screen]) #homeBtn,body.shared #h
     <div id="prizeBox"></div>
     <div class="r-cards" id="rCards"></div>
     <div id="rDots"></div>
+    <div id="boothQR"></div>
     <div class="panel" id="panel"></div>
     <div class="pnav"><button class="btn ghost" id="prevBtn"></button><button class="btn" id="nextBtn"></button></div>
     <div class="pnav" style="margin-top:14px;flex-wrap:wrap"><button class="btn ghost" id="againBtn"></button><button class="btn ghost" id="guideBtn"></button><button class="btn" id="qrBtn" style="display:none"></button><button class="btn" id="shareBtn" style="display:none"></button></div>
@@ -3763,7 +3782,16 @@ function buildReading(shared){
 
   $('rDots').innerHTML=[0,1,2].map(i=>`<span data-i="${i}"></span>`).join('');
   [...$('rDots').children].forEach(d=>d.onclick=()=>goStep(+d.dataset.i));
-  goStep(0,true);startWaves(mode);
+  document.body.classList.toggle('booth',!shared);
+  if(!shared){
+    [...rc.children].forEach(w=>{w.onclick=null;w.classList.add('active')});rc.classList.add('all','big');
+    const url=shareURL();
+    $('boothQR').innerHTML=url
+      ? `<div class="bq"><div class="bq-img" id="bqImg"></div><div class="bq-t"><div class="bq-h">📱 해석은 내 폰에서!</div>카메라로 QR을 찍으면<br><b>카드 해석 · 나의 물리학 성향 · 숨은 조합</b>을<br>바로 확인할 수 있어요.<div class="bq-s">결과 공유하기 · 카드 도감도 폰에서 볼 수 있어요</div></div></div>`
+      : `<div class="bq-warn">QR을 만들 웹 주소가 없어요. 코드 맨 위 SHARE_BASE에 주소를 넣거나 웹 주소로 열어 주세요.</div>`;
+    if(url){const q=qrcode(0,'M');q.addData(url);q.make();$('bqImg').innerHTML=q.createSvgTag({cellSize:6,margin:2,scalable:true})}
+    startWaves(mode);
+  } else { $('boothQR').innerHTML=''; goStep(0,true);startWaves(mode); }
   $('qrBtn').style.display='none';
   $('shareBtn').style.display=shared?'inline-flex':'none';
   $('againBtn').style.display=shared?'none':'';
