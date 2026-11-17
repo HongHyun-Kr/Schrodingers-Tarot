@@ -480,7 +480,7 @@ body{word-break:keep-all;overflow-wrap:break-word}
 /* v21 */
 .prize{margin-bottom:22px!important}
 #creditBtn{position:fixed;top:12px;right:58px;z-index:86;width:26px;height:26px;margin-top:6px;border-radius:50%;display:none;align-items:center;justify-content:center;background:transparent;border:1.3px solid #e8c66a77;color:#e8c66a;font:700 13px/1 Georgia,serif;cursor:pointer;padding:0;opacity:.5;transition:opacity .2s}#creditBtn:hover{opacity:1}
-body.shared #creditBtn{right:12px;margin-top:0}body:not([data-screen=read]) #creditBtn{display:none!important}
+body.shared #creditBtn{right:12px;margin-top:0}body.gd-open #creditBtn,body.gd-open #sndBtn,body.gd-open #homeBtn{display:none!important}body:not([data-screen=read]) #creditBtn{display:none!important}
 #sndBtn{position:fixed;top:12px;right:12px;z-index:86;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#1a1530cc;border:1px solid #e8c66a66;color:#e8c66a;cursor:pointer;padding:0;opacity:.75;transition:opacity .2s}#sndBtn:hover{opacity:1}#sndBtn svg{width:18px;height:18px}body.shared #sndBtn{display:none}
 #homeBtn{position:fixed;top:12px;left:12px;z-index:86;display:inline-flex;align-items:center;gap:6px;padding:7px 14px 7px 11px;border-radius:999px;
   font-family:var(--kr);font-size:13px;font-weight:700;color:#f3e3bb;cursor:pointer;border:1px solid #b8913a88;
@@ -500,6 +500,7 @@ body[data-screen=intro] #homeBtn,body:not([data-screen]) #homeBtn,body.shared #h
 .vx-egg{margin:16px 0 4px;padding:12px 14px;border-radius:12px;border:1px dashed #c08bffaa;background:#c08bff12;font-size:15px;line-height:1.8}
 .vx-eh{font-weight:800;color:#e6d0ff;margin-bottom:2px}
 .vx-end{margin-top:16px;padding-top:14px;border-top:1px dashed #e8c66a3a;font-size:16px;line-height:1.8}
+
 @media (max-width:520px){.vx-big{font-size:21px}.vx-name{font-size:21px}.vx-desc,.vx-egg,.vx-lab{font-size:14px}.vx-end{font-size:14.5px}#homeBtn{top:10px;left:10px;font-size:12px;padding:6px 12px 6px 9px}}
 
 /* v23: 부스 화면 = 카드 + QR만 */
@@ -549,6 +550,24 @@ body.booth #againBtn{margin-top:4px}
   body.booth .bq-t{font-size:15px}
   body.booth .prize.row{max-width:100%}
 }
+
+/* QR 결과 카드 탭(과거·현재·미래): 스크롤 없이 한 화면 */
+body.shared.fit .wrap{padding-top:calc(1.4*var(--vh,1vh));padding-bottom:calc(1*var(--vh,1vh))}
+body.shared.fit .bwrap{padding:0}
+body.shared.fit .result-banner{font-size:clamp(21px,calc(4.4*var(--vh,1vh)),40px);line-height:1.15}
+body.shared.fit .banner-sub{font-size:clamp(12px,calc(2*var(--vh,1vh)),15px);margin:2px 0 2px;line-height:1.4}
+body.shared.fit .banner-sub small{font-size:clamp(11px,calc(1.7*var(--vh,1vh)),12.5px)}
+body.shared.fit #waveCv{height:calc(3.2*var(--vh,1vh));margin-top:-6px}
+body.shared.fit .r-cards{--cw:min(24vw,calc(14.5*var(--vh,1vh)),112px)!important;margin:0;padding-top:calc(var(--cw)*1.7*.07 + 2px)}
+body.shared.fit .r-cards .cap{margin-top:4px}
+body.shared.fit .r-cards .cap .e{font-size:9px}
+body.shared.fit .r-cards .cap b{font-size:clamp(11.5px,calc(1.9*var(--vh,1vh)),13.5px);line-height:1.3}
+body.shared.fit #rDots{margin:calc(.8*var(--vh,1vh)) 0 0}
+body.shared.fit .panel{padding:calc(1.5*var(--vh,1vh)) 14px;margin:calc(1*var(--vh,1vh)) 0 calc(.8*var(--vh,1vh));font-size:clamp(12.5px,calc(2.05*var(--vh,1vh)),14.5px);line-height:1.62}
+body.shared.fit .panel .ctx{margin-top:calc(.8*var(--vh,1vh));padding-top:calc(.8*var(--vh,1vh))}
+body.shared.fit #pnav1 .btn{white-space:nowrap;padding-left:clamp(14px,4vw,22px);padding-right:clamp(14px,4vw,22px);padding-top:calc(.9*var(--vh,1vh));padding-bottom:calc(.9*var(--vh,1vh))}
+body.shared.fit .panel h3{font-size:clamp(15px,calc(2.5*var(--vh,1vh)),17px);margin-bottom:calc(.8*var(--vh,1vh))}
+body.shared.fit #pnav2,body.shared.fit .disclaimer{display:none!important}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=IM+Fell+English+SC&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
@@ -3897,11 +3916,24 @@ function buildReading(shared){
   else if(mode==='double') setTimeout(()=>{popup('double',rec);SFX.double()},500);
   else setTimeout(()=>SFX.superpose(),1150);
 }
+function setVH(){document.documentElement.style.setProperty('--vh',VH()/100+'px')}
+const VH=()=>Math.min(innerHeight,(window.visualViewport&&visualViewport.height)||innerHeight);
+function fitPanel(){const p=$('panel'),rc=$('rCards');p.style.fontSize='';rc.style.removeProperty('--cw');
+  if(!document.body.classList.contains('fit')||!document.body.classList.contains('shared'))return;
+  const over=()=>document.documentElement.scrollHeight>VH()+1;
+  let f=parseFloat(getComputedStyle(p).fontSize),n=0;
+  while(over()&&f>11.5&&n++<12){f-=.5;p.style.fontSize=f+'px'}
+  let cw=parseFloat(getComputedStyle(rc.querySelector('.card')||rc).width)||100;n=0;
+  while(over()&&cw>62&&n++<14){cw-=4;rc.style.setProperty('--cw',cw+'px','important')}}
+const refit=()=>{setVH();fitPanel()};
+addEventListener('resize',()=>setTimeout(refit,60));
+if(window.visualViewport)visualViewport.addEventListener('resize',()=>setTimeout(refit,60));
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>setTimeout(refit,50));
 function goStep(i,first){
-  RS.step=i;const p=$('panel');
+  RS.step=i;document.body.dataset.rstep=i;document.body.classList.toggle('fit',i<3);const p=$('panel');
   [...$('rCards').children].forEach((c,k)=>c.classList.toggle('active',k===i));$('rCards').classList.toggle('all',i===3);
   [...$('rDots').children].forEach((d,k)=>d.classList.toggle('on',i===3||k===i));
-  p.classList.remove('show');void p.offsetWidth;p.innerHTML=RS.secs[i];p.classList.add('show');
+  p.classList.remove('show');void p.offsetWidth;p.innerHTML=RS.secs[i];p.classList.add('show');requestAnimationFrame(fitPanel);setTimeout(fitPanel,450);
   $('prevBtn').style.display=i>0?'':'none';
   $('guideBtn').style.display=i===3?'inline-flex':'none';$('creditBtn').style.display=(i===3||!document.body.classList.contains('shared'))?'flex':'none';$('shareBtn').style.display=(i===3&&document.body.classList.contains('shared'))?'inline-flex':'none';if(i===3&&document.body.classList.contains('shared'))kakaoPrep();
   $('qrBtn').style.display=i===3&&!document.body.classList.contains('shared')?'inline-flex':'none';
@@ -3971,7 +4003,7 @@ $('againBtn').innerHTML=`${ICO.re}<span>다시 관측하기</span>`;$('prevBtn')
 $('startBtn').innerHTML=`<span>관측 시작</span>${ICO.r}`;
 $('againBtn').onclick=()=>{document.body.classList.remove('shared');if(params.get('r'))history.replaceState(null,'',location.pathname);show('intro')};
 $('guideBtn').innerHTML=`<svg class="ico s" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4 C6 3 8 3.5 10 5 C12 3.5 14 3 17 4 V16 C14 15 12 15.5 10 17 C8 15.5 6 15 3 16Z M10 5 V17" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg><span>카드 도감 보기</span>`;
-$('guideBtn').onclick=()=>{GUIDE.mount($('gd'),{onClose:()=>$('gdClose').click()});$('gdOverlay').classList.add('on');$('gdOverlay').scrollTop=0;document.body.style.overflow='hidden'};
+$('guideBtn').onclick=()=>{GUIDE.mount($('gd'),{onClose:()=>$('gdClose').click()});$('gdOverlay').classList.add('on');document.body.classList.add('gd-open');$('gdOverlay').scrollTop=0;document.body.style.overflow='hidden'};
 $('qrBtn').innerHTML=`<svg class="ico s" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 3h5v5H3zM12 3h5v5h-5zM3 12h5v5H3zM12 12h2v2h-2zM15 15h2v2h-2zM12 16h1M16 12h1" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>결과 QR로 가져가기</span>`;
 function sharePageURL(){
   const dir=(SHARE_BASE||location.origin+location.pathname).replace(/[^/]*$/,'');
@@ -4037,13 +4069,14 @@ $('shareBtn').onclick=async()=>{
 };
 function sndIcon(){$('sndBtn').innerHTML=`<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M3 7.5h3l4-3.5v12l-4-3.5H3z" fill="currentColor" fill-opacity=".25"/>${SFX.muted?'<path d="M13 7.5l5 5M18 7.5l-5 5"/>':'<path d="M13.2 7.2a4 4 0 0 1 0 5.6M15.4 5a7 7 0 0 1 0 10"/>'}</svg>`;$('sndBtn').title=SFX.muted?'효과음 켜기':'효과음 끄기'}
 sndIcon();$('sndBtn').onclick=()=>{SFX.toggle();sndIcon()};
+setVH();addEventListener('resize',setVH);
 $('homeBtn').onclick=()=>{const q=new URLSearchParams(location.search);q.delete('r');q.delete('guide');location.href=location.pathname+(q.toString()?'?'+q:'')};
 $('creditBtn').onclick=()=>$('crOverlay').classList.add('on');
 $('crClose').onclick=()=>$('crOverlay').classList.remove('on');
 $('crOverlay').onclick=e=>{if(e.target.id==='crOverlay')$('crOverlay').classList.remove('on')};
 $('qrClose').onclick=()=>$('qrOverlay').classList.remove('on');
 $('qrOverlay').onclick=e=>{if(e.target.id==='qrOverlay')$('qrOverlay').classList.remove('on')};
-if(params.get('guide')){GUIDE.mount($('gd'));$('gdOverlay').classList.add('on');document.body.style.overflow='hidden'}
+if(params.get('guide')){GUIDE.mount($('gd'));$('gdOverlay').classList.add('on');document.body.classList.add('gd-open');document.body.style.overflow='hidden'}
 /* 공유 링크로 들어온 경우: 결과 바로 보여주기 */
 (function(){const r=params.get('r');if(!r)return;const ids=r.split('.');const cs=ids.map(id=>CARDS.find(c=>c.id===id));
   if(cs.length!==3||cs.some(c=>!c)||cs.some((c,i)=>c.theme!==THEMES[i].key))return;
@@ -4053,7 +4086,7 @@ if(params.get('guide')){GUIDE.mount($('gd'));$('gdOverlay').classList.add('on');
   document.body.appendChild(en);
   setTimeout(()=>{en.classList.add('done');show('read');buildReading(true)},1500);
   setTimeout(()=>en.remove(),2200)})();
-$('gdClose').onclick=()=>{$('gdOverlay').classList.remove('on');document.body.style.overflow=''};
+$('gdClose').onclick=()=>{$('gdOverlay').classList.remove('on');document.body.classList.remove('gd-open');document.body.style.overflow=''};
 $('prevBtn').onclick=()=>goStep(Math.max(0,RS.step-1));
 $('nextBtn').onclick=()=>goStep(Math.min(3,RS.step+1));
 </script>
