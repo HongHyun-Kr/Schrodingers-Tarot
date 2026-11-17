@@ -468,6 +468,7 @@ body{word-break:keep-all;overflow-wrap:break-word}
 
 /* v21 */
 .prize{margin-bottom:22px!important}
+#sndBtn{position:fixed;top:12px;right:12px;z-index:86;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#1a1530cc;border:1px solid #e8c66a66;color:#e8c66a;cursor:pointer;padding:0;opacity:.75;transition:opacity .2s}#sndBtn:hover{opacity:1}#sndBtn svg{width:18px;height:18px}body.shared #sndBtn{display:none}
 #homeBtn{position:fixed;top:12px;left:12px;z-index:86;display:inline-flex;align-items:center;gap:6px;padding:7px 14px 7px 11px;border-radius:999px;
   font-family:var(--kr);font-size:13px;font-weight:700;color:#f3e3bb;cursor:pointer;border:1px solid #b8913a88;
   background:radial-gradient(ellipse at 50% -20%,#5a4214,#22180a 70%);box-shadow:inset 0 0 0 2px #1c1405,inset 0 0 0 3px #b8913a44,0 4px 12px #0008}
@@ -542,6 +543,8 @@ body.booth #againBtn{margin-top:4px}
 
 </head>
 <body>
+<button id="sndBtn" type="button" aria-label="효과음 켜기/끄기"></button>
+
 <canvas id="stars"></canvas>
 <canvas id="fx"></canvas>
 <button id="homeBtn" aria-label="처음 화면으로"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10 L10 3.5 L17 10 M5 8.5 V16.5 H15 V8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg><span>처음으로</span></button>
@@ -3577,6 +3580,39 @@ function cardEl(theme, card, flipped=false){
 }
 
 
+
+/* ===== 효과음 (Web Audio 합성, 부스 PC 전용) ===== */
+const SFX=(()=>{let ctx=null,master=null,muted=false;
+  try{const v=localStorage.getItem('qt_mute');muted=v===null?matchMedia('(pointer:coarse)').matches:v==='1'}catch(e){}
+  const on=()=>!muted&&!document.body.classList.contains('shared');
+  function ac(){if(!ctx){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ctx=new C();master=ctx.createGain();master.gain.value=.55;
+    const comp=ctx.createDynamicsCompressor();master.connect(comp);comp.connect(ctx.destination)}
+    if(ctx.state==='suspended')ctx.resume();return ctx}
+  function noise(dur){const c=ac(),b=c.createBuffer(1,Math.ceil(c.sampleRate*dur),c.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;const s=c.createBufferSource();s.buffer=b;return s}
+  function env(g,t,a,peak,dec){g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(0.0001,t+a+dec)}
+  function tone(f,t,dur,type='sine',vol=.2,a=.01,f2){const c=ctx,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+dur);
+    env(g,t,a,vol,dur);o.connect(g);g.connect(master);o.start(t);o.stop(t+a+dur+.05)}
+  function swish(t,dur=.16,vol=.35,f0=900,f1=3200){const c=ctx,s=noise(dur+.05),bp=c.createBiquadFilter(),g=c.createGain();bp.type='bandpass';bp.Q.value=1.2;
+    bp.frequency.setValueAtTime(f0,t);bp.frequency.exponentialRampToValueAtTime(f1,t+dur);env(g,t,.012,vol,dur);s.connect(bp);bp.connect(g);g.connect(master);s.start(t);s.stop(t+dur+.05)}
+  function tick(t,vol=.25){const c=ctx,s=noise(.04),hp=c.createBiquadFilter(),g=c.createGain();hp.type='highpass';hp.frequency.value=2500;env(g,t,.002,vol,.03);s.connect(hp);hp.connect(g);g.connect(master);s.start(t);s.stop(t+.05)}
+  const api={
+    unlock(){if(!muted)ac()},
+    shuffle(){if(!on()||!ac())return;const t=ctx.currentTime;for(let i=0;i<14;i++)tick(t+i*.011+Math.random()*.004,.12+Math.random()*.12);swish(t+.02,.14,.18,1500,4000)},
+    fan(){if(!on()||!ac())return;const t=ctx.currentTime;swish(t,.3,.22,600,2600)},
+    lift(){if(!on()||!ac())return;const t=ctx.currentTime;tone(520,t,.12,'triangle',.08,.005,780)},
+    flip(){if(!on()||!ac())return;const t=ctx.currentTime;swish(t,.13,.32,700,3600);tone(140,t+.1,.12,'sine',.18,.004,90)},
+    collapse(){if(!on()||!ac())return;const t=ctx.currentTime;[1318.5,1760,2093,2637].forEach((f,i)=>tone(f,t+i*.055,.5,'sine',.07,.004))},
+    jackpot(){if(!on()||!ac())return;const t=ctx.currentTime;
+      [523.25,659.25,783.99,1046.5].forEach((f,i)=>{tone(f,t+i*.11,.28,'triangle',.18,.006);tone(f*2,t+i*.11,.2,'sine',.05,.006)});
+      [523.25,659.25,783.99,1046.5,1318.5].forEach(f=>tone(f,t+.5,1.6,'triangle',.11,.02));
+      for(let i=0;i<10;i++)tone(1800+Math.random()*2200,t+.55+i*.09,.25,'sine',.05,.003)},
+    double(){if(!on()||!ac())return;const t=ctx.currentTime;   // 살짝 다른 두 주파수 → 맥놀이(간섭!)
+      tone(659.25,t,1.4,'sine',.16,.02);tone(663.5,t,1.4,'sine',.16,.02);tone(987.77,t+.18,1.1,'sine',.09,.02);tone(992,t+.18,1.1,'sine',.09,.02)},
+    superpose(){if(!on()||!ac())return;const t=ctx.currentTime;[392,493.88,587.33,739.99].forEach((f,i)=>tone(f,t+i*.07,1.3,'sine',.06,.08))},
+    get muted(){return muted},
+    toggle(){muted=!muted;try{localStorage.setItem('qt_mute',muted?'1':'0')}catch(e){}if(!muted){ac();api.lift()}return muted}
+  };return api})();
+
 /* 카드 이미지 저장 (우클릭 / 꾹 누르기 → JPG) */
 const JPG_CACHE={};
 function cardJPG(c){
@@ -3690,7 +3726,7 @@ async function startStage(){
   await sleep(60);
   // riffle shuffle
   for(let r=0;r<2;r++){
-    els.forEach((e,i)=>{e.style.transform=`translateX(${(i%2?1:-1)*(40+Math.random()*20)}px) rotate(${(i%2?1:-1)*8}deg)`});
+    els.forEach((e,i)=>{e.style.transform=`translateX(${(i%2?1:-1)*(40+Math.random()*20)}px) rotate(${(i%2?1:-1)*8}deg)`});SFX.shuffle();
     await sleep(170);
     els.forEach((e,i)=>{e.style.transform=`translate(${(Math.random()-.5)*6}px,${-i*1.5}px) rotate(${(Math.random()-.5)*4}deg)`;e.style.zIndex=(i*7+r*3)%els.length});
     await sleep(170);
@@ -3700,7 +3736,7 @@ async function startStage(){
   const gap=Math.min(cw*0.62,(W-cw)/(n-1));
   els.forEach((e,i)=>{const k=i-(n-1)/2;e.style.zIndex=i;e.style.transform=`translate(${k*gap}px,${k*k*6}px) rotate(${k*4.5}deg)`;
     e.onclick=()=>pick(i,e)});
-  deck.classList.add('fanned');
+  deck.classList.add('fanned');SFX.fan();
   await sleep(320);
   $('hint').textContent='당신의 파동과 가장 깊이 공명하는 카드 한 장을 관측하세요';
   locked=false;
@@ -3721,7 +3757,7 @@ async function pick(i,el){
   const card=chooseCard(i), th=THEMES[step], last=step===2;
   $('hint').textContent='';
   [...$('deck').children].forEach(e=>{if(e!==el){e.classList.add('gone');e.style.transform+=' translateY(60px)'}});
-  el.style.transform+=' translateY(-34px) scale(1.08)';
+  el.style.transform+=' translateY(-34px) scale(1.08)';SFX.lift();
   await sleep(380);
   // 1) 뽑은 카드를 크게 확대해서 중앙에
   const from=el.getBoundingClientRect();
@@ -3732,9 +3768,9 @@ async function pick(i,el){
   const dx=from.left+from.width/2-(to.left+to.width/2), dy=from.top+from.height/2-(to.top+to.height/2), sc=from.width/to.width;
   await big.animate([{transform:`translate(${dx}px,${dy}px) scale(${sc})`},{transform:`translate(${dx*.3}px,${dy*.3-30}px) scale(${(sc+1)/2}) rotate(-8deg)`,offset:.5},{transform:'none'}],
     {duration:850,easing:'cubic-bezier(.5,0,.3,1)'}).finished;
-  big.classList.add('flipped');
+  big.classList.add('flipped');SFX.flip();
   await sleep(500);
-  burst(big.getBoundingClientRect(),LABS[card.lab].color,44);
+  burst(big.getBoundingClientRect(),LABS[card.lab].color,44);SFX.collapse();
   // 2) 메시지 — 버튼 누를 때까지 유지
   const cl=$('collapse');
   cl.innerHTML=`<span class="ket"><span class="kp">|ψ⟩</span><span class="ka">→</span><span class="kb">|</span><span class="kn">${card.title}</span><span class="kb">⟩</span></span><small>관측 성공! 중첩돼 있던 운명이</small><span class="krn">${card.kr}</span><small>카드로 붕괴했어요</small>`;
@@ -3779,7 +3815,7 @@ function buildReading(shared){
   const rc=$('rCards');rc.className='r-cards'+(mode==='jackpot'?' jackpot':'');rc.innerHTML='';
   picks.forEach((c,i)=>{const w=document.createElement('div');w.className='rc';const e=cardEl(THEMES[i],c);w.appendChild(e);
     w.insertAdjacentHTML('beforeend',`<div class="cap"><div class="e">${THEMES[i].en}</div><b>${c.kr}</b></div>`);
-    w.onclick=()=>goStep(i);rc.appendChild(w);attachSave(e.querySelector('.front'),c);setTimeout(()=>e.classList.add('flipped'),250+i*300);if(shared)setTimeout(()=>{e.classList.add('flat');flatten(e,c)},1400+i*300)});
+    w.onclick=()=>goStep(i);rc.appendChild(w);attachSave(e.querySelector('.front'),c);setTimeout(()=>{e.classList.add('flipped');SFX.flip()},250+i*300);if(shared)setTimeout(()=>{e.classList.add('flat');flatten(e,c)},1400+i*300)});
 
   const profName = CONFIG.showProfNames?`${LABS[P.lab].prof} 교수님`:`${labCode(P.lab)} 교수님`;
   const ctxP = P.ctx[LABS[L.lab].tag], ctxS = St.ctx[LABS[P.lab].tag];
@@ -3836,8 +3872,9 @@ function buildReading(shared){
   if(shared){document.body.classList.add('shared');return}
   $('againBtn').innerHTML=`${ICO.re}<span>다시 관측하기</span>`;
   document.body.classList.remove('shared');
-  if(mode==='jackpot') setTimeout(()=>popup('jackpot',rec),500);
-  else if(mode==='double') setTimeout(()=>popup('double',rec),500);
+  if(mode==='jackpot') setTimeout(()=>{popup('jackpot',rec);SFX.jackpot()},500);
+  else if(mode==='double') setTimeout(()=>{popup('double',rec);SFX.double()},500);
+  else setTimeout(()=>SFX.superpose(),1150);
 }
 function goStep(i,first){
   RS.step=i;const p=$('panel');
@@ -3907,7 +3944,7 @@ function confetti(ms){const end=Date.now()+ms;const cols=['#ffd54a','#e2553c','#
     c:cols[Math.random()*cols.length|0],shape:Math.random()<.15?'psi':'rect',t:['ψ','ħ','∞','★'][Math.random()*4|0],rot:Math.random()*6,vr:(Math.random()-.5)*.2});kick();if(Date.now()<end)setTimeout(spawn,60)})()}
 
 /* ---------------- wiring ---------------- */
-$('startBtn').onclick=async()=>{await popup('rule');step=0;picks=[];$('deck').style.height='';$('deck').style.display='';$('nextDraw').style.display='none';$('readBtn').style.display='none';show('draw');buildSlots();setTimeout(startStage,300)};
+$('startBtn').onclick=async()=>{SFX.unlock();await popup('rule');step=0;picks=[];$('deck').style.height='';$('deck').style.display='';$('nextDraw').style.display='none';$('readBtn').style.display='none';show('draw');buildSlots();setTimeout(startStage,300)};
 $('readBtn').onclick=()=>{show('read');buildReading()};
 $('againBtn').innerHTML=`${ICO.re}<span>다시 관측하기</span>`;$('prevBtn').innerHTML=`${ICO.l}<span>이전</span>`;
 $('startBtn').innerHTML=`<span>관측 시작</span>${ICO.r}`;
@@ -3977,6 +4014,8 @@ $('shareBtn').onclick=async()=>{
   try{await navigator.clipboard.writeText(purl);toast('링크 복사 완료! 붙여 넣어 공유하세요')}
   catch(e){const ta=document.createElement('textarea');ta.value=purl;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('링크 복사 완료! 붙여 넣어 공유하세요')}catch(_){toast('주소창의 링크를 복사해서 공유해 주세요')}ta.remove()}
 };
+function sndIcon(){$('sndBtn').innerHTML=`<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M3 7.5h3l4-3.5v12l-4-3.5H3z" fill="currentColor" fill-opacity=".25"/>${SFX.muted?'<path d="M13 7.5l5 5M18 7.5l-5 5"/>':'<path d="M13.2 7.2a4 4 0 0 1 0 5.6M15.4 5a7 7 0 0 1 0 10"/>'}</svg>`;$('sndBtn').title=SFX.muted?'효과음 켜기':'효과음 끄기'}
+sndIcon();$('sndBtn').onclick=()=>{SFX.toggle();sndIcon()};
 $('homeBtn').onclick=()=>{const q=new URLSearchParams(location.search);q.delete('r');q.delete('guide');location.href=location.pathname+(q.toString()?'?'+q:'')};
 $('qrClose').onclick=()=>$('qrOverlay').classList.remove('on');
 $('qrOverlay').onclick=e=>{if(e.target.id==='qrOverlay')$('qrOverlay').classList.remove('on')};
