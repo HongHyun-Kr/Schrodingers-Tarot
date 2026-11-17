@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>슈뢰딩거의 타로 — 2026 반도체물리학부 학술제</title>
+<!-- 링크 미리보기 (카톡 등): og:image / og:url 은 실제 GitHub 주소로 맞춰 주세요 -->
+<meta name="description" content="과거·현재·미래 세 장으로 관측하는 나의 물리학 운명. 그런데 결과에 반전이 있다? 🔮">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="슈뢰딩거의 타로">
+<meta property="og:title" content="슈뢰딩거의 타로 · 나의 물리학 운명">
+<meta property="og:description" content="과거·현재·미래 세 장으로 관측한 나의 운명… 그런데 결과에 반전이 있다? 🤫">
+<meta property="og:image" content="https://honghyun-kr.github.io/tarot/og.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:url" content="https://honghyun-kr.github.io/tarot/">
+<meta name="twitter:card" content="summary_large_image">
 <style>
 :root{
   --bg:#120f24; --ink:#f5ecd7; --gold:#e8c66a; --muted:#b3acd0;
@@ -380,6 +390,8 @@ body{word-break:keep-all;overflow-wrap:break-word}
  #gd .eimg{width:80px}#gd .ec{width:92px}#gd .etxt{font-size:14px}
 }
 #gd .ec span b{font-family:Cinzel,serif;color:#e6d0ff;font-size:12px;letter-spacing:1px}
+#gd .gbottom{margin:26px 0 10px}#gd .gimg{position:relative}
+#gd .saveimg{position:absolute;inset:0;width:100%;height:100%;opacity:.01;-webkit-touch-callout:default;user-select:auto;z-index:3}
 
 #gdOverlay{position:fixed;inset:0;z-index:80;overflow-y:auto;background:radial-gradient(ellipse at 50% -10%,#33285e,#141128 60%);display:none;padding:34px 16px 70px}
 #gdOverlay.on{display:block;animation:fade .35s}
@@ -435,6 +447,21 @@ body{word-break:keep-all;overflow-wrap:break-word}
   .prize.row .big{font-size:16px}
 }
 @media (max-width:520px){#gdOverlay{padding-top:70px}#gdClose{top:12px;right:12px;width:38px;height:38px}}
+
+.front{position:absolute}
+.saveimg{position:absolute;inset:0;width:100%;height:100%;opacity:.01;-webkit-touch-callout:default;-webkit-user-select:auto;user-select:auto;z-index:3;border-radius:inherit}
+#entry{position:fixed;inset:0;z-index:95;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  background:radial-gradient(ellipse at 50% 40%,#33285e,#0f0c20 75%);transition:opacity .6s,transform .6s}
+#entry.done{opacity:0;transform:scale(1.08);pointer-events:none}
+.en-cards{display:flex;gap:12px}
+.en-c{width:min(24vw,110px);aspect-ratio:200/340;animation:enWob 1.1s ease-in-out infinite}
+.en-c:nth-child(2){animation-delay:.15s}.en-c:nth-child(3){animation-delay:.3s}
+.en-c svg{width:100%;height:100%;border-radius:8px;box-shadow:0 0 22px #e8c66a55}
+@keyframes enWob{0%,100%{transform:translateY(0) rotate(-3deg);filter:blur(0)}50%{transform:translateY(-12px) rotate(3deg);filter:blur(1.2px) brightness(1.3)}}
+.en-t{font-family:var(--en);font-size:44px;color:var(--gold);text-shadow:0 0 18px #e8c66a99;animation:enPulse 1s ease-in-out infinite}
+@keyframes enPulse{50%{opacity:.45;transform:scale(.92)}}
+.en-s{color:#cfc6ea;font-size:15px}
+.prize.row{max-width:700px}.prize.row .cbox .small{white-space:nowrap}.prize .big{text-wrap:balance}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=IM+Fell+English+SC&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
@@ -3474,16 +3501,34 @@ function cardEl(theme, card, flipped=false){
   return d;
 }
 
+
+/* 카드 이미지 저장 (우클릭 / 꾹 누르기 → JPG) */
+const JPG_CACHE={};
+function cardJPG(c){
+  if(JPG_CACHE[c.id])return JPG_CACHE[c.id];
+  return JPG_CACHE[c.id]=new Promise(res=>{
+    const svg=faceSVG(c).replace('<svg ','<svg width="600" height="1020" ');
+    const img=new Image();
+    img.onload=()=>{const cv=document.createElement('canvas');cv.width=600;cv.height=1020;const x=cv.getContext('2d');
+      x.fillStyle='#141128';x.fillRect(0,0,600,1020);x.drawImage(img,0,0,600,1020);try{res(cv.toDataURL('image/jpeg',.92))}catch(e){res(null)}};
+    img.onerror=()=>res(null);
+    img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);});
+}
+function attachSave(host,c){
+  if(!host||host.querySelector('.saveimg'))return;
+  cardJPG(c).then(u=>{if(!u||host.querySelector('.saveimg'))return;const im=document.createElement('img');
+    im.className='saveimg';im.src=u;im.alt=c.kr;im.title=c.kr+' (우클릭·꾹 눌러 저장)';host.appendChild(im)});
+}
 /*DATA_END*/
 const EXPLAIN={"web": {"d": "이슬 맺힌 거미줄이 밤하늘에 걸려 있고, 한가운데엔 눈이 땡그란 거미 한 마리가 그물 전체를 붙잡고 있어요.", "w": "CMP의 주무기는 텐서 네트워크예요. 복잡하게 얽힌 양자 상태를 작은 텐서들의 그물로 표현하죠. 노드와 연결선을 그리다 보니 거미줄이 됐어요.", "q": "이 거미는 파리 대신 양자 상태를 잡습니다. 2ᴺ개짜리로요."}, "star": {"d": "보랏빛 플라즈마 별이 반짝이고, 그 아래 놓인 웨이퍼 위로 이온과 라디칼이 비처럼 쏟아져 내려요.", "w": "플라즈마는 전자·이온·라디칼이 뒤섞인 제4의 물질 상태예요. 반도체 식각 공정의 핵심이고, 챔버 창으로 보이는 보랏빛 글로우가 바로 이 별의 정체예요.", "q": "소원은 별한테 빌고, 식각은 플라즈마한테 맡기세요."}, "lovers": {"d": "선글라스 없는 순한 태양 아래, 머리 위 화살표가 같은 방향인 두 사람이 손을 잡고 있어요.", "w": "SSQM은 스핀트로닉스와 MRAM을 연구해요. 두 자성층의 스핀이 평행이면 저항이 낮고 반평행이면 높아요. 함께 으쌰으쌰하는 분위기까지 담아 연인 카드로 만들었어요.", "q": "둘이 반대 방향 보면? 저항 올라갑니다. 연애도 소자도."}, "hermit": {"d": "후드를 눌러쓴 나무늘보가 태양전지 랜턴을 들고 언덕에 서 있어요. 동그란 눈과 볼터치가 포인트예요.", "w": "HSL은 반도체 소자와 솔라셀을 연구하는 조용한(은둔형!) 연구실이에요. 상징 동물이 나무늘보라서, 느리지만 꾸준히 빛을 모으는 랜턴을 쥐여 줬어요.", "q": "움직임은 느리지만, 랜턴은 계속 충전 중입니다."}, "hive": {"d": "아래로 갈수록 색이 진해지는 벌집에서 꿀이 몇 방울 흘러내리고, 꿀벌 한 마리가 그 위를 날아다녀요.", "w": "TMDL의 상징은 벌집과 꿀벌이에요. ALD·스퍼터 같은 단위공정으로 박막을 한 층씩 쌓아 올리는 모습이, 칸칸이 쌓이는 벌집과 꼭 닮았어요.", "q": "꿀은 한 방울씩, 박막은 한 층씩."}, "sun": {"d": "선글라스 낀 태양이 보라색 레이저 세 줄을 쏘고, 맞은 자리마다 반짝. 바닥 실리콘엔 물결무늬.", "w": "NPD는 UV 레이저로 실리콘 박막을 녹였다 굳혀 결정화하고, 표면에 주기적인 나노 무늬(LIPSS)를 새겨요. 태양은 레이저, 바닥 물결은 LIPSS예요.", "q": "선글라스는 패션이 아니라 보안경입니다."}, "wheel": {"d": "눈금이 촘촘한 운명의 수레바퀴. 빨간 펌프 빔, 파란 점선 프로브 빔, 바퀴 위엔 손잡은 빨강·파랑 커플.", "w": "SSNL은 펨토초 레이저로 반도체 속 엑시톤이 생기고 움직이고 사라지는 과정을 관찰해요. 펌프로 때리고 시간차를 두고 프로브로 찍는 방식이 돌아가는 바퀴 같아요.", "q": "운명은 돌고 돕니다. 단, 10⁻¹⁵초 단위로."}, "hiero": {"d": "붉은 커튼 앞 칠판 가득 ψ와 낙서가 적혀 있고, 흰 법복의 교황이 분필 지팡이를 들고 칠판을 가리켜요.", "w": "연구 아이디어는 학생이 키우고 교수님과 토의하며 다듬는 연구실이에요. 정답 대신 “어떻게 풀 건데?”를 물어봐 주시는 칠판 앞의 교황님.", "q": "이 교황님의 성경책은 해밀토니안입니다."}, "emperor": {"d": "몸통이 그냥 진공 챔버인 황제가 앉아 있어요. 뷰포트는 배꼽처럼 보랏빛으로 빛나고, 손엔 홀 대신 렌치.", "w": "플라즈마 원리부터 진공 장비 유지보수까지 직접 다루는 연구실이에요. 장비를 너무 잘 아셔서, 아예 장비가 되어 버린 황제님으로 그렸어요.", "q": "짜치는데 자꾸 보고 싶은 카드 1위."}, "magician": {"d": "머리 위 ∞, 초록 망토 마법사가 말굽자석을 번쩍. 테이블 위 스핀들이 일제히 위를 봐요.", "w": "교수님이 좋아하시는 색은 초록, 연구실이 가장 아끼는 가치는 협업이에요. 흩어진 스핀도 사람도 한 방향으로 모으는 자석의 마법사로 그렸어요.", "q": "이 마법사 앞에선 스핀도 사람도 줄을 섭니다."}, "temper": {"d": "날개 단 천사가 컵에 담긴 빛을 태양전지 패널로 살살 부어요. 한 발은 연못가에, 주변엔 붓꽃이 피어 있어요.", "w": "젠틀한 교수님과 솔라셀 연구를 한 장에 담았어요. 빛을 한 방울씩 천천히 전기로 바꾸는 모습이, 서두르지 않는 절제 카드와 꼭 닮았어요.", "q": "급할수록 천천히. 광자도 천천히 부으면 전기가 됩니다."}, "justice": {"d": "두 기둥 사이 정의의 여신. 저울 한쪽엔 웨이퍼, 다른 쪽엔 곡선 하나 그려진 데이터 쪽지, 반대 손엔 검.", "w": "“정답이라 생각한다면 논리로 설명하라.” TMDL이 가장 중요하게 여기는 가치예요. 타협하지 않는 마음으로 데이터와 논리로 판결하는 정의의 여신이에요.", "q": "근거 없는 주장은 기각합니다. 탕탕."}, "priestess": {"d": "광학 포스트 두 개 사이의 여사제. 왕관엔 렌즈, 무릎 위 실리콘은 반은 결정·반은 비정질, 뒤 휘장엔 나노 물결.", "w": "NPD의 핵심 키워드는 레이저 결정화와 나노포토닉스예요. 빛이 닿는 순간 무질서한 비정질 실리콘이 질서 있는 결정으로 다시 태어나는 장면을 담았어요.", "q": "여사제의 비밀은 “천천히 식혀라”입니다."}, "chariot": {"d": "쇠 맛 나는 흑호 두 마리가 전차를 끌어요. 바퀴 안엔 펄스가 굴러가고, 차체엔 펄스 문양이 새겨져 있어요.", "w": "SSNL의 상징은 “쇠 맛 나는 흑호”예요. 교수님과 수평적으로 의견을 나누고 도전정신을 가장 중요하게 여기는 연구실이라, 함께 달리는 전차로 그렸어요.", "q": "안전벨트 매세요. 이 전차는 펨토초로 출발합니다."}, "moon": {"d": "새벽 3시, 초승달은 졸고 서버랙 불빛만 깜빡여요. 모니터 속 그래프는 드디어 한 점으로 수렴하는 중이에요.", "w": "CMP는 복잡한 양자 문제를 컴퓨터로 푸는 전산 연구실이에요. 계산을 돌려 놓고 결과가 수렴하길 기다리는 밤, 대학원생이라면 누구나 아는 그 풍경이에요.", "q": "달도 자는데 job은 안 잡니다."}, "tower": {"d": "아크 맞고 뚜껑 날아간 챔버. 그을음이 흘러내리고 연기 폴폴. 옆 사다리엔 렌치 든 대학원생.", "w": "장비와 공정 문제를 함께 분석하고 해결하는 연구실이에요. 시행착오를 두려워하지 않고, 고장 난 장비 앞에서 원인부터 찾는 학생이 잘 어울려요.", "q": "탑이 무너질 때 도망가면 학부생, 사다리 타면 대학원생."}, "cups": {"d": "세 사람의 손이 커피잔을 들고 짠! 뒤로는 스키장 설산과 서핑보드가 꽂힌 바다가 펼쳐져 있어요.", "w": "매일 함께 점심 먹고 커피타임, 여름엔 워터파크·서핑, 겨울엔 스키 MT까지. 사이좋기로 소문난 SSQM 대학원생들의 평범한(?) 일상이에요.", "q": "이 연구실 회비 대부분은 원두값이라는 소문이…(사실무근)"}, "void": {"d": "핀 조명 아래 텅 빈 나무 의자 하나. 그 주위로 빨강·파랑 입자 쌍이 생겼다 사라지기를 반복해요.", "w": "HSL은 지금 대학원생이 없어요. 하지만 물리학에서 진공은 결코 비어 있지 않죠. 언제든 새로운 무언가가 생겨날 수 있는 자리라는 뜻이에요.", "q": "누가 앉을진 몰라도, 양자역학적으로는 이미 누가 앉아 있습니다."}, "pentacles": {"d": "성당 대신 TFT 단면을 차곡차곡 쌓는 장인. 아치엔 금화 세 개가 박혀 있고, 장인 손엔 망치가 들려 있어요.", "w": "TMDL은 산화물 반도체로 TFT를 직접 만들어요. 타로의 장인 카드가 원래 건물을 짓는 사람이라, TFT를 짓는 사람으로 바꿨어요. 동전 셋은 소스·게이트·드레인 전극이에요.", "q": "벽돌 대신 원자층, 시멘트 대신 어닐링."}, "mirrors": {"d": "광학 테이블 위 거울 여덟 개, 지그재그로 튕기는 보라색 빔. 보안경 낀 수습생이 노브 돌리는 중.", "w": "NPD의 실험은 광학계 정렬에서 시작해요. 거울과 렌즈를 하나하나 맞추는 꾸준함을 묵묵한 수련의 카드 “8 of Pentacles”로 담았어요.", "q": "빔이 마지막 거울에 딱 맞는 순간, 그게 대학원 행복입니다."}, "world": {"d": "마이크로 LED 픽셀이 박힌 화관 안에서 VR 헤드셋 쓴 사람이 춤춰요. 네 귀퉁이엔 크기별로 색이 다른 퀀텀닷.", "w": "VVL은 퀀텀닷·마이크로 LED와 AR/VR 디스플레이를 연구해요. 세계 카드의 화관을 픽셀로 바꿨고, 퀀텀닷은 작을수록 파랗고 클수록 빨갛게 그렸어요.", "q": "이 세계는 해상도가 무한입니다. 픽셀이 마이크로라서요."}, "kingprism": {"d": "보라 왕좌의 왕이 프리즘을 번쩍. 흰빛이 무지개 여섯 갈래로 퍼지고, 끝엔 전구·두루마리·동전.", "w": "VVL의 상징은 프리즘이에요. 학생 아이디어를 존중하고, 연구는 물론 특허·창업·경진대회까지 함께 밀어주시는 교수님을 빛을 쪼개는 왕으로 그렸어요.", "q": "아이디어 하나 들고 가면 무지개 여섯 개로 돌려받습니다."}, "fool": {"d": "헤드셋 쓴 바보가 절벽 끝으로 성큼. 발밑은 낭떠러지가 아니라 RGB 픽셀 징검다리. 보따리엔 아이디어, 옆엔 신난 강아지.", "w": "VVL은 정해진 답보다 스스로 탐구하는 연구실이에요. 창업·특허 경험도 있죠. 타로 0번 바보는 겁 없는 첫걸음, 새로운 길을 여는 사람을 뜻해요.", "q": "남들은 절벽이라 하고, 이 연구실은 창업 아이템이라 합니다."}, "empress": {"d": "울타리 없는 들판, 쓰러진 기둥, 털에 스핀 하나씩 달고 풀 뜯는 양 떼. 땅 밑엔 지층처럼 박막이 쌓이고 새싹이 올라와요.", "w": "NSL은 정기 미팅 없이 자유롭게 연구하는 “울타리 없는 목장”이에요. 스핀트로닉스와 박막성장을 연구해서 양털엔 스핀, 땅속엔 박막 층을 넣었어요.", "q": "이 목장의 양은 도망가도 괜찮아요. 스핀 방향만 맞으면."}, "kingwings": {"d": "노을 진 하늘 아래 바위에 앉은 노왕. 손엔 스핀처럼 북쪽을 가리키는 나침반, 그 바늘 끝을 따라 철새 떼가 V자로 날아가요.", "w": "NSL의 상징은 철새예요. 자유롭게 날지만 때와 방향은 분명하죠. 실제로 철새는 지구 자기장으로 길을 찾는대요. 오랜 세월 스핀을 연구해 오신 교수님의 나침반이에요.", "q": "회의는 없지만 방향은 있다. 이게 진짜 자율 비행."}, "sixwings": {"d": "작은 배에 포스터 통 들고 탄 대학원생, 머리 위엔 철새 여섯 마리, 건너편엔 깃발 꽂힌 학회장.", "w": "NSL은 국내외 학회 활동이 활발하고, 졸업한 선배들까지 모이는 송년회도 있어요. 새 땅으로 건너가는 “6 of Swords” 카드를 패러디했어요.", "q": "포스터 통 들고 비행기 타는 순간, 진짜 대학원생이 됩니다."}, "ace": {"d": "구름에서 나온 손이 반짝이는 결정 단위 격자를 들고 있어요. 꼭짓점엔 원자, 가운데엔 금빛 원자, 아래로 빛방울이 떨어져요.", "w": "QMP는 제일원리 계산으로 원자와 전자에서 출발해 물질의 성질을 예측해요. 타로의 에이스는 “시작”을 뜻해서, 가장 작은 단위인 결정 격자를 건네는 손으로 그렸어요.", "q": "에이스 카드 중에 원자 개수 세는 건 이 카드뿐입니다."}, "judgement": {"d": "구름 위 천사가 나팔을 불어요. 나팔엔 밴드 구조가 그려진 깃발, 아래 계산 칩에서 파란 전자들이 손 들고 깨어나요.", "w": "QMP는 계산으로 예측하는 데서 그치지 않고 그 물리적 원리까지 설명하려 해요. 잠든 이들을 깨우는 심판 카드처럼, 계산 속 전자를 깨워 “왜?”를 묻는 교수님이에요.", "q": "이 천사의 나팔 소리는 “수렴 완료” 알림음과 같다고 합니다."}, "hangedmag": {"d": "끊어진 줄, 거꾸로 둥둥 뜬 웃는 자석, 아래 초전도체에서 피어오르는 냉기. 옆에선 노트북 든 대학원생이 올려다봐요.", "w": "QMP는 초전도도 연구해요. “매달린 사람”은 세상을 거꾸로 보는 지혜의 카드라서, 예상과 다른 결과도 끝까지 원인을 찾는 학생을 줄 없이 뜬 자석으로 표현했어요.", "q": "줄이 없는데 왜 떠 있냐고요? 그걸 계산하는 게 이 연구실입니다."}, "page": {"d": "시종이 지팡이 끝에 달린 펄스를 신기하게 올려다봐요. 발밑엔 처음 보는 반짝이는 보석(신소재)들이 흩어져 있어요.", "w": "SSNL엔 처음 보는 개념에도 겁먹지 않고 도전하는 학생, 여러 분야로 지식을 넓히고 싶은 학생이 잘 어울려요. 시종 카드는 “배우는 사람”을 뜻해요.", "q": "처음엔 다 시종부터. 지팡이는 연구실에서 줍니다."}};
 const GUIDE=(()=>{
   const DECK={lab:'과거',prof:'현재',student:'미래'};
   const TAGLAB={};Object.entries(LABS).forEach(([k,v])=>TAGLAB[v.tag]=k);
   const br=t=>t.replace(/([.!?…])\s+(?=\S)/g,'$1<br>');
-  let V;
+  let V,O={};
   const lnav=cur=>`<div class="lnav">${Object.keys(LABS).map(k=>`<span data-k="${k}" class="${k===cur?'on':''}">${labCode(k)}</span>`).join('')}<span data-k="EGGS" class="ent ${cur==='EGGS'?'on':''}">✦ ENTANGLED</span></div>`;
-  const top=()=>V.scrollIntoView({block:'start'});
-  function wire(){V.querySelector('.back').onclick=home;V.querySelectorAll('.lnav span').forEach(s=>s.onclick=()=>s.dataset.k==='EGGS'?eggs():lab(s.dataset.k));top()}
+  const top=()=>{const sc=V.closest('#gdOverlay');if(sc)sc.scrollTop=0;else window.scrollTo(0,0)};
+  function wire(){V.querySelectorAll('.back').forEach(b=>b.onclick=home);V.querySelectorAll('.gimg').forEach(h=>attachSave(h,CARDS.find(c=>c.id===h.dataset.id)));V.querySelectorAll('.lnav span').forEach(s=>s.onclick=()=>s.dataset.k==='EGGS'?eggs():lab(s.dataset.k));top()}
   function home(){
     V.innerHTML=`<div class="ghd"><h1>CARD COLLECTION</h1><p class="lead">슈뢰딩거의 타로 카드 도감 · ${Object.keys(LABS).length}개 연구실 · ${CARDS.length}장</p></div>
      <div class="grid">${Object.entries(LABS).map(([k,L])=>`<div class="gtab" data-k="${k}" style="--lc:${L.color}">
@@ -3492,7 +3537,8 @@ const GUIDE=(()=>{
       <div class="gtab ent" data-k="EGGS" style="--lc:#c08bff"><div class="entminis">${EGGS.slice(0,3).map(e=>`<div>${faceSVG(CARDS.find(c=>c.id===e.ids[0]))}</div><i>×</i><div>${faceSVG(CARDS.find(c=>c.id===e.ids[1]))}</div>`).slice(0,1).join('')}</div><div class="nm">ENTANGLED</div><div class="sub">특정 두 카드가 만나면 뜻밖에 얽혀 버리는 조합 ${EGGS.length}가지</div></div></div>
      <div class="how"><b>카드 보는 법</b>연구실마다 과거·현재·미래 카드가 한 장씩 있어요.<br>타로에서 세 장이 모두 같은 연구실이면 잭팟!
       <b>함께 뽑힌 카드</b>현재·미래 카드는 함께 뽑힌 카드에 따라 해석이 조금씩 달라져요.
-      <b>ENTANGLED</b>특정 두 장이 만나면 서로 얽혀서 결과에 이야기가 하나 더 붙어요.</div>`;
+      <b>ENTANGLED</b>특정 두 장이 만나면 서로 얽혀서 결과에 이야기가 하나 더 붙어요.</div>${O.onClose?'<div class="gbottom"><span class="back close">← 결과로 돌아가기</span></div>':''}`;
+    const cb=V.querySelector('.back.close');if(cb)cb.onclick=()=>O.onClose();
     V.querySelectorAll('.gtab').forEach(t=>t.onclick=()=>t.dataset.k==='EGGS'?eggs():lab(t.dataset.k));
   }
   function lab(k){const L=LABS[k];
@@ -3500,15 +3546,15 @@ const GUIDE=(()=>{
       <div class="meta">${L.name} · ${L.prof} 교수님 · ${L.recruit}</div><div class="one">“${L.one}”</div></div>
       ${CARDS.filter(c=>c.lab===k).map(c=>{const E=EXPLAIN[c.id]||{};
         const ctx=c.ctx?`<dt>함께 뽑힌 카드</dt><dd><table>${Object.entries(c.ctx).filter(([t])=>TAGLAB[t]).map(([t,v])=>`<tr><td>${labCode(TAGLAB[t])}</td><td>${v}</td></tr>`).join('')}</table></dd>`:'';
-        return `<div class="gcard"><div class="img">${faceSVG(c)}</div><div>
+        return `<div class="gcard"><div class="img gimg" data-id="${c.id}">${faceSVG(c)}</div><div>
           <h3>${c.num} · ${c.title}<small>${c.kr}</small></h3><span class="pill">${DECK[c.theme]} 카드</span>
           ${E.q?`<div class="q">${E.q}</div>`:''}
-          <dl><dt>카드 속 장면</dt><dd>${E.d||''}</dd><dt>연구실 이야기</dt><dd>${E.w||''}</dd><dt>타로 해석</dt><dd>${c.read}</dd>${ctx}</dl></div></div>`}).join('')}`;
+          <dl><dt>카드 속 장면</dt><dd>${E.d||''}</dd><dt>연구실 이야기</dt><dd>${E.w||''}</dd><dt>타로 해석</dt><dd>${c.read}</dd>${ctx}</dl></div></div>`}).join('')}<div class="gbottom"><span class="back">← 전체 연구실</span></div>`;
     wire();}
   function eggs(){const f=id=>CARDS.find(c=>c.id===id);
     V.innerHTML=`<span class="back">← 전체 연구실</span>${lnav('EGGS')}<div class="labhead" style="--lc:#c08bff"><h2>ENTANGLED</h2><div class="meta">뜻밖의 양자 얽힘 · 이 두 장이 함께 나오면 서로 얽혀 버려요</div></div>
-     <ul class="eggs">${EGGS.map(e=>{const a=f(e.ids[0]),b=f(e.ids[1]);return `<li><div class="epair"><div class="ec"><div class="eimg">${faceSVG(a)}</div><span><b>${labCode(a.lab)}</b><br>${a.kr}</span></div><div class="ex">⟷</div><div class="ec"><div class="eimg">${faceSVG(b)}</div><span><b>${labCode(b.lab)}</b><br>${b.kr}</span></div></div><div class="etxt">${br(e.t)}</div></li>`}).join('')}</ul>`;wire();}
-  return {mount(el){V=el;home()},home};
+     <ul class="eggs">${EGGS.map(e=>{const a=f(e.ids[0]),b=f(e.ids[1]);return `<li><div class="epair"><div class="ec"><div class="eimg gimg" data-id="${a.id}">${faceSVG(a)}</div><span><b>${labCode(a.lab)}</b><br>${a.kr}</span></div><div class="ex">⟷</div><div class="ec"><div class="eimg gimg" data-id="${b.id}">${faceSVG(b)}</div><span><b>${labCode(b.lab)}</b><br>${b.kr}</span></div></div><div class="etxt">${br(e.t)}</div></li>`}).join('')}</ul><div class="gbottom"><span class="back">← 전체 연구실</span></div>`;wire();}
+  return {mount(el,o){V=el;O=o||{};home()},home};
 })();
 
 /* ---------------- background stars ---------------- */
@@ -3587,7 +3633,7 @@ async function pick(i,el){
   const from=el.getBoundingClientRect();
   $('deck').style.display='none';
   const rv=$('reveal');rv.innerHTML='';rv.classList.add('on');$('draw').classList.add('revealing');
-  const big=cardEl(th,card);big.classList.add('big');rv.appendChild(big);
+  const big=cardEl(th,card);big.classList.add('big');rv.appendChild(big);attachSave(big.querySelector('.front'),card);
   const to=big.getBoundingClientRect();
   const dx=from.left+from.width/2-(to.left+to.width/2), dy=from.top+from.height/2-(to.top+to.height/2), sc=from.width/to.width;
   await big.animate([{transform:`translate(${dx}px,${dy}px) scale(${sc})`},{transform:`translate(${dx*.3}px,${dy*.3-30}px) scale(${(sc+1)/2}) rotate(-8deg)`,offset:.5},{transform:'none'}],
@@ -3633,13 +3679,13 @@ function buildReading(shared){
   RS.mode=mode;
 
   const banner=$('banner');banner.className='result-banner '+mode;
-  banner.textContent={jackpot:'★ JACKPOT ★',double:'2 / 3 MATCH',none:'SUPERPOSITION'}[mode];
-  $('bannerSub').innerHTML={jackpot:`세 장 모두 <b>${labCode(rec)}</b>!`,double:`두 장이 <b>${labCode(rec)}</b>를 가리켜요`,none:'세 장 모두 다른 연구실'}[mode]+`<small>${{jackpot:'운명이 한 연구실로 완전히 붕괴했어요',double:'아깝게 잭팟을 놓쳤어요',none:'운명은 아직 중첩 상태예요'}[mode]}</small>`;
+  banner.textContent={jackpot:'★ JACKPOT ★',double:'INTERFERENCE',none:'SUPERPOSITION'}[mode];
+  $('bannerSub').innerHTML={jackpot:`세 장 모두 <b>${labCode(rec)}</b>!`,double:`두 장이 <b>${labCode(rec)}</b>로 보강 간섭!`,none:'세 장 모두 다른 연구실'}[mode]+`<small>${{jackpot:'운명이 한 연구실로 완전히 붕괴했어요',double:'한 장만 더 맞았으면 완전 붕괴였어요',none:'운명은 아직 중첩 상태예요'}[mode]}</small>`;
 
   const rc=$('rCards');rc.className='r-cards'+(mode==='jackpot'?' jackpot':'');rc.innerHTML='';
   picks.forEach((c,i)=>{const w=document.createElement('div');w.className='rc';const e=cardEl(THEMES[i],c);w.appendChild(e);
     w.insertAdjacentHTML('beforeend',`<div class="cap"><div class="e">${THEMES[i].en}</div><b>${c.kr}</b></div>`);
-    w.onclick=()=>goStep(i);rc.appendChild(w);setTimeout(()=>e.classList.add('flipped'),250+i*300)});
+    w.onclick=()=>goStep(i);rc.appendChild(w);attachSave(e.querySelector('.front'),c);setTimeout(()=>e.classList.add('flipped'),250+i*300)});
 
   const profName = CONFIG.showProfNames?`${LABS[P.lab].prof} 교수님`:`${labCode(P.lab)} 교수님`;
   const ctxP = P.ctx[LABS[L.lab].tag], ctxS = St.ctx[LABS[P.lab].tag];
@@ -3654,15 +3700,12 @@ function buildReading(shared){
   const eggs=EGGS.filter(e=>e.ids.every(x=>ids.includes(x)));
   const R=LABS[rec];
   const br=t=>t.replace(/([.!?…])\s+(?=\S)/g,'$1<br>');
-  const head={jackpot:['JACKPOT','세 장 모두 '+labCode(rec)],double:['2 / 3 MATCH','두 장이 '+labCode(rec)],none:['SUPERPOSITION','세 장 모두 다른 연구실']}[mode];
+  const head={jackpot:['JACKPOT','세 장 모두 '+labCode(rec)],double:['INTERFERENCE','두 장이 '+labCode(rec)+'로 보강 간섭'],none:['SUPERPOSITION','세 장 모두 다른 연구실']}[mode];
   const desc={jackpot:`파동함수가 하나의 상태로 완전히 붕괴했어요.<br>1/${N_LABS*N_LABS} 확률을 뚫은 <b>관측된 진로</b>예요.`,
     double:`운명의 확률 진폭이 <b>${labCode(rec)}</b> 쪽으로 기울어 있어요.<br>잭팟은 아깝지만, 간섭무늬의 <b>가장 밝은 줄</b>에 서 있는 셈이에요.`,
     none:`당신의 운명은 아직 <b>중첩 상태</b>예요.<br>대학원은 직접 관측하는 순간 붕괴하니까,<br>지금 당신을 이끄는 <b>${labCode(rec)}</b>부터 관측해 보세요.`}[mode];
   const nm = R.name.startsWith(labCode(rec))?R.name:`${labCode(rec)} · ${R.name}`;
   const card=id=>CARDS.find(c=>c.id===id);
-  const consult = rec==='HSL'
-    ? '🦥 HSL은 지금 은둔 중이에요.<br>복도에서 교수님을 뵈면 <b>인사부터</b> 드려 보세요.'
-    : `📍 부스의 <b>${labCode(rec)}</b> 대학원생에게<br><b>“타로 보고 왔어요”</b> 한마디면 상담 시작이에요.`;
   secs.push(`<h3><span class='t'>결론</span>운명의 연구실</h3>
     <div class="vb"><div class="vl">① 매칭 결과</div><div class="vm ${mode}"><span>${head[1]}${mode==='jackpot'?'!':''}</span></div><div class="vd">${desc}</div></div>
     <div class="vb"><div class="vl">② 추천 연구실</div>
@@ -3671,15 +3714,14 @@ function buildReading(shared){
       <div class="vtags">${R.kw.map(k=>`<span class="tag">${k}</span>`).join('')}</div>
       <div class="vmsg">“${R.msg}”</div>
       <div class="vrec ${/없음/.test(R.recruit)?'off':''}">${R.recruit}</div></div>
-    ${eggs.length?`<div class="vb"><div class="vl">③ ENTANGLED · 뜻밖의 얽힘</div>${eggs.map(e=>`<div class="vegg"><div class="pair">‘${card(e.ids[0]).kr}’ <i>×</i> ‘${card(e.ids[1]).kr}’</div><div>${br(e.t)}</div></div>`).join('')}</div>`:''}
-    <div class="vb"><div class="vl">${eggs.length?'④':'③'} 대학원 상담</div><div class="vd">${consult}</div></div>`);
+    ${eggs.length?`<div class="vb"><div class="vl">③ ENTANGLED · 뜻밖의 얽힘</div>${eggs.map(e=>`<div class="vegg"><div class="pair">‘${card(e.ids[0]).kr}’ <i>×</i> ‘${card(e.ids[1]).kr}’</div><div>${br(e.t)}</div></div>`).join('')}</div>`:''}`);
   RS.secs=secs;
 
   const code=String(Math.floor(1000+Math.random()*9000)), tt=new Date().toTimeString().slice(0,5);
   if(shared){$('prizeBox').innerHTML=''}
   else $('prizeBox').innerHTML = mode==='jackpot'
-    ? `<div class="prize row"><div><div class="big">🎁 잭팟 경품 당첨!</div><div class="small">이 화면을 부스 진행자에게 보여주세요</div></div><div class="cbox"><div class="code">${code}</div><div class="small">${tt} 발급 · 1회 한정</div></div></div>`
-    : mode==='double' ? `<div class="prize purple"><div class="big">🍬 2/3 일치! 참가 간식 증정</div><div>이 화면을 부스 진행자에게 보여주세요</div></div>` : '';
+    ? `<div class="prize row"><div><div class="big">🍽 잭팟! ${labCode(rec)} 대학원생과의 식사권</div><div class="small">부스의 대학원생에게 이 화면을 보여주세요</div></div><div class="cbox"><div class="code">${code}</div><div class="small">${tt} 발급 · 1회 한정</div></div></div>`
+    : mode==='double' ? `<div class="prize purple"><div class="big">☕ 보강 간섭! ${labCode(rec)} 대학원생과 커피 한 잔</div><div class="small">부스의 대학원생에게 이 화면을 보여주세요</div></div>` : '';
 
   $('rDots').innerHTML=[0,1,2].map(i=>`<span data-i="${i}"></span>`).join('');
   [...$('rDots').children].forEach(d=>d.onclick=()=>goStep(+d.dataset.i));
@@ -3734,13 +3776,13 @@ function popup(kind,lab,dur){
   ov.className='overlay on '+kind;
   if(kind==='rule'){
     box.innerHTML=`<div class="ov-t">JACKPOT RULE</div><div class="ov-cards">${THEMES.map(t=>`<div class="mini">${backSVG(t)}</div>`).join('')}</div>
-      <div class="ov-m">과거 · 현재 · 미래<br><b>세 장이 모두 같은 연구실</b>이면</div><div class="ov-big">🎁 경품 증정!</div><div class="ov-s">화면을 누르면 시작해요</div>`;dur=dur||3200;
+      <div class="ov-m">과거 · 현재 · 미래<br><b>세 장이 모두 같은 연구실</b>이면</div><div class="ov-big">🍽 그 연구실 대학원생과 식사!</div><div class="ov-m" style="margin-top:6px;font-size:15px">두 장만 같아도 ☕ 커피 한 잔</div><div class="ov-s">화면을 누르면 시작해요</div>`;dur=dur||3200;
   }else if(kind==='jackpot'){
     box.innerHTML=`<div class="ov-t big">JACKPOT</div><div class="ov-cards">${picks.map(c=>`<div class="mini">${faceSVG(c)}</div>`).join('')}</div>
-      <div class="ov-m">세 장 모두 <b>${labCode(lab)}</b>!<br>1/${N_LABS*N_LABS} 확률을 뚫었어요</div><div class="ov-big">🎁 경품 당첨</div>`;dur=dur||4200;
+      <div class="ov-m">세 장 모두 <b>${labCode(lab)}</b>!<br>1/${N_LABS*N_LABS} 확률을 뚫었어요</div><div class="ov-big">🍽 ${labCode(lab)} 대학원생과의 식사권</div>`;dur=dur||4200;
     confetti(4200);
   }else{
-    box.innerHTML=`<div class="ov-t">2 / 3 MATCH</div><div class="ov-m">두 장이 <b>${labCode(lab)}</b>를 가리켜요</div><div class="ov-big">🍬 참가 간식 증정</div>`;dur=dur||2400;
+    box.innerHTML=`<div class="ov-t">INTERFERENCE</div><div class="ov-m">두 장이 <b>${labCode(lab)}</b>로 보강 간섭!</div><div class="ov-big">☕ ${labCode(lab)} 대학원생과 커피 한 잔</div>`;dur=dur||2600;
   }
   return new Promise(res=>{let done=false;const close=()=>{if(done)return;done=true;ov.classList.add('out');setTimeout(()=>{ov.className='overlay';res()},450)};
     ov.onclick=close;setTimeout(close,dur)});
@@ -3767,7 +3809,7 @@ $('againBtn').innerHTML=`${ICO.re}<span>다시 관측하기</span>`;$('prevBtn')
 $('startBtn').innerHTML=`<span>관측 시작</span>${ICO.r}`;
 $('againBtn').onclick=()=>{document.body.classList.remove('shared');if(params.get('r'))history.replaceState(null,'',location.pathname);show('intro')};
 $('guideBtn').innerHTML=`<svg class="ico s" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4 C6 3 8 3.5 10 5 C12 3.5 14 3 17 4 V16 C14 15 12 15.5 10 17 C8 15.5 6 15 3 16Z M10 5 V17" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg><span>카드 도감 보기</span>`;
-$('guideBtn').onclick=()=>{GUIDE.mount($('gd'));$('gdOverlay').classList.add('on');$('gdOverlay').scrollTop=0;document.body.style.overflow='hidden'};
+$('guideBtn').onclick=()=>{GUIDE.mount($('gd'),{onClose:()=>$('gdClose').click()});$('gdOverlay').classList.add('on');$('gdOverlay').scrollTop=0;document.body.style.overflow='hidden'};
 $('qrBtn').innerHTML=`<svg class="ico s" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 3h5v5H3zM12 3h5v5h-5zM3 12h5v5H3zM12 12h2v2h-2zM15 15h2v2h-2zM12 16h1M16 12h1" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>결과 QR로 가져가기</span>`;
 function shareURL(){
   const base=SHARE_BASE||(/^https?:/.test(location.protocol)?location.origin+location.pathname:'');
@@ -3795,7 +3837,12 @@ if(params.get('guide')){GUIDE.mount($('gd'));$('gdOverlay').classList.add('on');
 /* 공유 링크로 들어온 경우: 결과 바로 보여주기 */
 (function(){const r=params.get('r');if(!r)return;const ids=r.split('.');const cs=ids.map(id=>CARDS.find(c=>c.id===id));
   if(cs.length!==3||cs.some(c=>!c)||cs.some((c,i)=>c.theme!==THEMES[i].key))return;
-  picks=cs;show('read');buildReading(true)})();
+  picks=cs;
+  const en=document.createElement('div');en.id='entry';
+  en.innerHTML=`<div class="en-cards">${THEMES.map(t=>`<div class="en-c">${backSVG(t)}</div>`).join('')}</div><div class="en-t">|ψ⟩</div><div class="en-s">중첩된 운명을 다시 관측하는 중…</div>`;
+  document.body.appendChild(en);
+  setTimeout(()=>{en.classList.add('done');show('read');buildReading(true)},1500);
+  setTimeout(()=>en.remove(),2200)})();
 $('gdClose').onclick=()=>{$('gdOverlay').classList.remove('on');document.body.style.overflow=''};
 $('prevBtn').onclick=()=>goStep(Math.max(0,RS.step-1));
 $('nextBtn').onclick=()=>goStep(Math.min(3,RS.step+1));
