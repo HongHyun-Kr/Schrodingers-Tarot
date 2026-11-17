@@ -549,6 +549,24 @@ body.booth #againBtn{margin-top:4px}
   body.booth .bq-t{font-size:15px}
   body.booth .prize.row{max-width:100%}
 }
+
+/* QR 결과 카드 탭(과거·현재·미래): 스크롤 없이 한 화면 */
+body.shared.fit .wrap{padding-top:calc(1.4*var(--vh,1vh));padding-bottom:calc(1*var(--vh,1vh))}
+body.shared.fit .bwrap{padding:0}
+body.shared.fit .result-banner{font-size:clamp(21px,calc(4.4*var(--vh,1vh)),40px);line-height:1.15}
+body.shared.fit .banner-sub{font-size:clamp(12px,calc(2*var(--vh,1vh)),15px);margin:2px 0 2px;line-height:1.4}
+body.shared.fit .banner-sub small{font-size:clamp(11px,calc(1.7*var(--vh,1vh)),12.5px)}
+body.shared.fit #waveCv{height:calc(3.8*var(--vh,1vh));margin-top:-6px}
+body.shared.fit .r-cards{--cw:min(25vw,calc(15.5*var(--vh,1vh)),118px)!important;margin:0;padding-top:calc(var(--cw)*1.7*.07 + 2px)}
+body.shared.fit .r-cards .cap{margin-top:4px}
+body.shared.fit .r-cards .cap .e{font-size:9px}
+body.shared.fit .r-cards .cap b{font-size:clamp(11.5px,calc(1.9*var(--vh,1vh)),13.5px);line-height:1.3}
+body.shared.fit #rDots{margin:calc(.8*var(--vh,1vh)) 0 0}
+body.shared.fit .panel{padding:calc(1.5*var(--vh,1vh)) 14px;margin:calc(1*var(--vh,1vh)) 0 calc(.8*var(--vh,1vh));font-size:clamp(12.5px,calc(2.05*var(--vh,1vh)),14.5px);line-height:1.62}
+body.shared.fit .panel .ctx{margin-top:calc(.8*var(--vh,1vh));padding-top:calc(.8*var(--vh,1vh))}
+body.shared.fit #pnav1 .btn{padding-top:calc(.9*var(--vh,1vh));padding-bottom:calc(.9*var(--vh,1vh))}
+body.shared.fit .panel h3{font-size:clamp(15px,calc(2.5*var(--vh,1vh)),17px);margin-bottom:calc(.8*var(--vh,1vh))}
+body.shared.fit #pnav2,body.shared.fit .disclaimer{display:none!important}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=IM+Fell+English+SC&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
@@ -3897,11 +3915,16 @@ function buildReading(shared){
   else if(mode==='double') setTimeout(()=>{popup('double',rec);SFX.double()},500);
   else setTimeout(()=>SFX.superpose(),1150);
 }
+function fitPanel(){const p=$('panel');p.style.fontSize='';
+  if(!document.body.classList.contains('fit')||!document.body.classList.contains('shared'))return;
+  let f=parseFloat(getComputedStyle(p).fontSize),n=0;
+  while(document.documentElement.scrollHeight>innerHeight+1&&f>11&&n++<12){f-=.5;p.style.fontSize=f+'px'}}
+addEventListener('resize',()=>setTimeout(fitPanel,60));
 function goStep(i,first){
-  RS.step=i;const p=$('panel');
+  RS.step=i;document.body.classList.toggle('fit',i<3);const p=$('panel');
   [...$('rCards').children].forEach((c,k)=>c.classList.toggle('active',k===i));$('rCards').classList.toggle('all',i===3);
   [...$('rDots').children].forEach((d,k)=>d.classList.toggle('on',i===3||k===i));
-  p.classList.remove('show');void p.offsetWidth;p.innerHTML=RS.secs[i];p.classList.add('show');
+  p.classList.remove('show');void p.offsetWidth;p.innerHTML=RS.secs[i];p.classList.add('show');requestAnimationFrame(fitPanel);
   $('prevBtn').style.display=i>0?'':'none';
   $('guideBtn').style.display=i===3?'inline-flex':'none';$('creditBtn').style.display=(i===3||!document.body.classList.contains('shared'))?'flex':'none';$('shareBtn').style.display=(i===3&&document.body.classList.contains('shared'))?'inline-flex':'none';if(i===3&&document.body.classList.contains('shared'))kakaoPrep();
   $('qrBtn').style.display=i===3&&!document.body.classList.contains('shared')?'inline-flex':'none';
@@ -4037,6 +4060,7 @@ $('shareBtn').onclick=async()=>{
 };
 function sndIcon(){$('sndBtn').innerHTML=`<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M3 7.5h3l4-3.5v12l-4-3.5H3z" fill="currentColor" fill-opacity=".25"/>${SFX.muted?'<path d="M13 7.5l5 5M18 7.5l-5 5"/>':'<path d="M13.2 7.2a4 4 0 0 1 0 5.6M15.4 5a7 7 0 0 1 0 10"/>'}</svg>`;$('sndBtn').title=SFX.muted?'효과음 켜기':'효과음 끄기'}
 sndIcon();$('sndBtn').onclick=()=>{SFX.toggle();sndIcon()};
+const setVH=()=>document.documentElement.style.setProperty('--vh',innerHeight/100+'px');setVH();addEventListener('resize',setVH);
 $('homeBtn').onclick=()=>{const q=new URLSearchParams(location.search);q.delete('r');q.delete('guide');location.href=location.pathname+(q.toString()?'?'+q:'')};
 $('creditBtn').onclick=()=>$('crOverlay').classList.add('on');
 $('crClose').onclick=()=>$('crOverlay').classList.remove('on');
