@@ -3859,8 +3859,8 @@ function buildReading(shared){
     jackpot:`<div class="vx-big jackpot">🎉 완전 붕괴!</div>과거도, 현재도, 미래도<br>전부 <b>${lcode}</b>을(를) 가리켰어요.<br>확률을 뚫고 파동함수가 딱 한 상태로 정해졌네요.<br>우주가 이렇게까지 확실하게 말하는 일, 흔치 않아요.`,
     double:`<div class="vx-big double">✨ 보강 간섭!</div>세 장 중 두 장이 <b>${lcode}</b> 쪽에서 겹쳤어요.<br>위상이 딱 맞아서 진폭이 두 배!<br>운명이 꽤 진지하게 손짓하는 중이에요.`,
     none:`<div class="vx-big none">🌀 아직 중첩 상태</div>세 장이 전부 다른 연구실을 가리키네요.<br>당신의 운명은 여러 가능성이 겹쳐 있는 상태예요.<br>그래도 지금 가장 세게 끌어당기는 건<br><b>${lcode}</b>!`}[mode];
-  const egg=eggs.map(e=>`<div class="vx-egg"><div class="vx-eh">💞 잠깐, ENTANGLED 발견!</div>‘${card(e.ids[0]).kr}’와(과) ‘${card(e.ids[1]).kr}’가 얽혔어요.<br>${br(e.t)}</div>`).join('');
-  const closer=shared?`<div class="vx-end">이 운명, 직접 관측해 보고 싶다면?<br>학술제 타로 부스로 놀러 오세요 🔮</div>`:{
+  const egg=eggs.map(e=>`<div class="vx-egg"><div class="vx-eh">💞 잠깐, ENTANGLED 발견!</div>‘${card(e.ids[0]).kr}’와(과) ‘${card(e.ids[1]).kr}’이(가) 얽혔어요.<br>${br(e.t)}</div>`).join('');
+  const closer=shared?`<div class="vx-end">이 운명, 직접 관측해 보고 싶다면?<br>코워킹스페이스 타로 부스로 놀러 오세요 🔮</div>`:{
     jackpot:`<div class="vx-end">부스의 <b>${lcode}</b> 대학원생에게 이 화면을 보여주고<br>밥 한 끼 얻어먹으러 가요 🍽</div>`,
     double:`<div class="vx-end">부스의 <b>${lcode}</b> 대학원생이<br>커피 한 잔 쏜대요 ☕</div>`,
     none:`<div class="vx-end">한 번 더 관측하면 운명이 붕괴할지도…? 🔮</div>`}[mode];
@@ -4030,7 +4030,7 @@ $('shareBtn').onclick=async()=>{
     if(!Kakao.isInitialized())Kakao.init(KAKAO_JS_KEY);
     const img=KAKAO_IMG||await kakaoPrep();
     if(img){const link={mobileWebUrl:url,webUrl:url};
-      Kakao.Share.sendDefault({objectType:'feed',content:{title,description:desc,imageUrl:img,imageWidth:800,imageHeight:400,link},buttons:[{title:'내 결과 보기',link}]});
+      Kakao.Share.sendDefault({objectType:'feed',content:{title,description:desc,imageUrl:img,imageWidth:800,imageHeight:400,link},buttons:[{title:'결과 구경하러 가기',link}]});
       return}}catch(e){console.warn('kakao share failed',e);toast('카카오 공유 오류: '+(e&&(e.code||e.msg||e.message)||e))}}
   // 2) 링크 하나만 공유 → 카톡이 유형별 미리보기(이미지+제목) 카드로 보여줌
   if(navigator.share){try{await navigator.share({url:purl});return}catch(e){if(e&&e.name==='AbortError')return}}
